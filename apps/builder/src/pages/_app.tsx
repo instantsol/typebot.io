@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 import { AppProps } from 'next/app'
 import { SessionProvider } from 'next-auth/react'
 import { ChakraProvider, createStandaloneToast } from '@chakra-ui/react'
@@ -22,6 +22,7 @@ import { isCloudProdInstance } from '@/helpers/isCloudProdInstance'
 import { initPostHogIfEnabled } from '@/features/telemetry/posthog'
 import { TolgeeProvider, useTolgeeSSR } from '@tolgee/react'
 import { tolgee } from '@/lib/tolgee'
+import InitializePostEvents from './postevents'
 
 initPostHogIfEnabled()
 
@@ -32,6 +33,10 @@ const App = ({ Component, pageProps }: AppProps) => {
   const ssrTolgee = useTolgeeSSR(tolgee, router.locale)
 
   useRouterProgressBar()
+
+  useLayoutEffect( () => {
+    InitializePostEvents()
+  }, [])
 
   useEffect(() => {
     if (
