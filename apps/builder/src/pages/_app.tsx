@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect } from 'react'
+import { useEffect } from 'react'
 import { AppProps } from 'next/app'
 import { SessionProvider } from 'next-auth/react'
 import { ChakraProvider, createStandaloneToast } from '@chakra-ui/react'
@@ -34,7 +34,7 @@ const App = ({ Component, pageProps }: AppProps) => {
 
   useRouterProgressBar()
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     InitializePostEvents()
   }, [])
 
