@@ -34,7 +34,7 @@ const App = ({ Component, pageProps }: AppProps) => {
 
   useRouterProgressBar()
 
-  useLayoutEffect( () => {
+  useLayoutEffect(() => {
     InitializePostEvents()
   }, [])
 
