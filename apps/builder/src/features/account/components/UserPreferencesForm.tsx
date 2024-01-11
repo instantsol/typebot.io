@@ -65,7 +65,7 @@ export const UserPreferencesForm = () => {
 
   return (
     <Stack spacing={12}>
-      <HStack spacing={4}>
+      {/* <HStack spacing={4}>
         <Heading size="md">{t('account.preferences.language.heading')}</Heading>
         <Menu>
           <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
@@ -97,7 +97,7 @@ export const UserPreferencesForm = () => {
             {t('account.preferences.language.tooltip')}
           </MoreInfoTooltip>
         )}
-      </HStack>
+      </HStack> */}
       <Stack spacing={6}>
         <Heading size="md">
           {t('account.preferences.graphNavigation.heading')}

@@ -15,7 +15,7 @@ export const tolgee = Tolgee()
   .init({
     apiKey: env.NEXT_PUBLIC_TOLGEE_API_KEY,
     apiUrl: env.NEXT_PUBLIC_TOLGEE_API_URL,
-    defaultLanguage: 'en',
+    defaultLanguage: 'pt-BR',
     availableLanguages: ['en', 'fr', 'de', 'pt', 'pt-BR', 'es', 'ro'],
     fallbackLanguage: 'en',
     staticData: {
