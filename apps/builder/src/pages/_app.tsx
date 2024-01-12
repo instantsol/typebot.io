@@ -23,7 +23,6 @@ import { initPostHogIfEnabled } from '@/features/telemetry/posthog'
 import { TolgeeProvider, useTolgeeSSR } from '@tolgee/react'
 import { tolgee } from '@/lib/tolgee'
 
-
 initPostHogIfEnabled()
 
 const { ToastContainer, toast } = createStandaloneToast(customTheme)

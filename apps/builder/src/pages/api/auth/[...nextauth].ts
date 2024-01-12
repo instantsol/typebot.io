@@ -198,9 +198,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   let restricted: 'rate-limited' | undefined
 
-  if (req.url?.startsWith('/api/auth/signin/automaticsignin')){
-    console.log("chave: ",req.headers.customkey)
-    const ret = await NextAuthApiAutomaticHandler(req, res, getAuthOptions({ restricted }))
+  if (req.url?.startsWith('/api/auth/signin/automaticsignin')) {
+    console.log('chave: ', req.headers.customkey)
+    const ret = await NextAuthApiAutomaticHandler(
+      req,
+      res,
+      getAuthOptions({ restricted })
+    )
     return ret
   }
 

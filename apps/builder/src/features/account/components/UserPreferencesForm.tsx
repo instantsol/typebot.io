@@ -1,8 +1,4 @@
-import {
-  Stack,
-  Heading,
-  useColorMode,
-} from '@chakra-ui/react'
+import { Stack, Heading, useColorMode } from '@chakra-ui/react'
 import { GraphNavigation } from '@typebot.io/prisma'
 import React, { useEffect } from 'react'
 import { GraphNavigationRadioGroup } from './GraphNavigationRadioGroup'

@@ -1,7 +1,6 @@
 import { sendMagicLinkEmail } from '@typebot.io/emails'
 //import { PrismaClient } from '@prisma/client';
 
-
 type Props = {
   identifier: string
   url: string

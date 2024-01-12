@@ -1,37 +1,33 @@
-
 import prisma from '@typebot.io/lib/prisma'
-import type { AuthOptions } from "next-auth/"
-import { randomBytes } from "crypto"
-import { createHash } from "crypto"
-import type {
-  NextApiRequest,
-  NextApiResponse,
-} from "next"
+import type { AuthOptions } from 'next-auth/'
+import { randomBytes } from 'crypto'
+import { createHash } from 'crypto'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
-async function getApiKey(key:string){
+async function getApiKey(key: string) {
   try {
     const apiKey = await prisma.apiToken.findFirst({
-      where :{
-        ownerId: key
-      }
+      where: {
+        ownerId: key,
+      },
     })
     return apiKey
-  }catch(err){
+  } catch (err) {
     return null
   }
 }
 
-async function checkPermission(key:string){
-  try{
+async function checkPermission(key: string) {
+  try {
     const authorized = await prisma.embed.findFirst({
-      where :{
-        hash: key
-      }
+      where: {
+        hash: key,
+      },
     })
-    if (authorized == null){
+    if (authorized == null) {
       return false
     }
-  } catch (err){
+  } catch (err) {
     return false
   }
   return true
@@ -42,8 +38,8 @@ async function getBot(key: string) {
     where: {
       workspaceId: key,
     },
-  });
-  return botsResult;
+  })
+  return botsResult
 }
 
 async function getWorkspaceId(key: string) {
@@ -52,19 +48,19 @@ async function getWorkspaceId(key: string) {
       where: {
         userId: key,
       },
-    });
+    })
 
-    const botsList = [];
+    const botsList = []
     if (workspaceIdResult !== null) {
       for (const item of workspaceIdResult) {
-        const workspaceId = item.workspaceId;
-        botsList.push(await getBot(workspaceId)); 
+        const workspaceId = item.workspaceId
+        botsList.push(await getBot(workspaceId))
       }
-      return botsList;
+      return botsList
     }
-    return null;
+    return null
   } catch (err) {
-    return null;
+    return null
   }
 }
 
@@ -73,17 +69,19 @@ async function NextAuthApiAutomaticHandler(
   res: NextApiResponse,
   options: AuthOptions
 ) {
-  try{
+  try {
     const customkey = req.headers.customkey
-    if(await checkPermission(customkey) == false){
-      return res.json({ url: null})
+    if ((await checkPermission(customkey)) == false) {
+      return res.json({ url: null })
     }
-  }catch(err){
-    return res.json({ url: null})
+  } catch (err) {
+    return res.json({ url: null })
   }
-  const {  ...query } = req.query
+  const { ...query } = req.query
   const email: string = query?.email ? query.email.toString() : ''
-  const callbackUrl: string = query?.callbackUrl ? query.callbackUrl.toString() : ''
+  const callbackUrl: string = query?.callbackUrl
+    ? query.callbackUrl.toString()
+    : ''
   const originalUrl: string = query?.url ? query.url.toString() : ''
   const identifier = email
   const adapter = options.adapter
@@ -93,18 +91,16 @@ async function NextAuthApiAutomaticHandler(
   const user = await options.adapter?.getUserByEmail(email)
   //eslint-disable-next-line
   const botsList = await getWorkspaceId(user?.id)
-  const token = randomBytes(32).toString("hex")
+  const token = randomBytes(32).toString('hex')
 
   //eslint-disable-next-line
   const apikey = await getApiKey(user?.id)
   const ONE_DAY_IN_SECONDS = 86400
-  const expires = new Date(
-    Date.now() + (3600 ?? ONE_DAY_IN_SECONDS) * 1000
-  )
+  const expires = new Date(Date.now() + (3600 ?? ONE_DAY_IN_SECONDS) * 1000)
 
   const params = new URLSearchParams({ callbackUrl, token, email: email })
   const _url = `${originalUrl}/api/auth/callback/email?${params}`
-  if (adapter && secret && identifier){
+  if (adapter && secret && identifier) {
     await adapter?.createVerificationToken?.({
       identifier,
       token: hashToken(token, secret),
@@ -112,21 +108,16 @@ async function NextAuthApiAutomaticHandler(
     })
   }
 
-  return res.json({ 
+  return res.json({
     url: _url,
     botlist: botsList,
     user: user,
-    apikey: apikey?.id
-    
+    apikey: apikey?.id,
   })
 }
 
 export default NextAuthApiAutomaticHandler
 
 export function hashToken(token: string, secret: string) {
-  return (
-    createHash("sha256")
-      .update(`${token}${secret}`)
-      .digest("hex")
-  )
+  return createHash('sha256').update(`${token}${secret}`).digest('hex')
 }
