@@ -22,7 +22,7 @@ import { isCloudProdInstance } from '@/helpers/isCloudProdInstance'
 import { initPostHogIfEnabled } from '@/features/telemetry/posthog'
 import { TolgeeProvider, useTolgeeSSR } from '@tolgee/react'
 import { tolgee } from '@/lib/tolgee'
-import InitializePostEvents from './postevents'
+
 
 initPostHogIfEnabled()
 
@@ -33,10 +33,6 @@ const App = ({ Component, pageProps }: AppProps) => {
   const ssrTolgee = useTolgeeSSR(tolgee, router.locale)
 
   useRouterProgressBar()
-
-  useEffect(() => {
-    InitializePostEvents()
-  }, [])
 
   useEffect(() => {
     if (

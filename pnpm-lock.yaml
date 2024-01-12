@@ -77,6 +77,9 @@ importers:
       '@paralleldrive/cuid2':
         specifier: 2.2.1
         version: 2.2.1
+      '@prisma/client':
+        specifier: ^5.8.0
+        version: 5.8.0
       '@sentry/nextjs':
         specifier: 7.77.0
         version: 7.77.0(next@14.0.3)(react@18.2.0)
@@ -173,6 +176,9 @@ importers:
       dequal:
         specifier: 2.0.3
         version: 2.0.3
+      dotenv:
+        specifier: ^16.3.1
+        version: 16.3.1
       emojilib:
         specifier: 3.0.10
         version: 3.0.10
@@ -6594,6 +6600,17 @@ packages:
       prisma: 5.0.0
     dev: false
 
+  /@prisma/client@5.8.0:
+    resolution: {integrity: sha512-QxO6C4MaA/ysTIbC+EcAH1aX/YkpymhXtO6zPdk+FvA7+59tNibIYpd+7koPdViLg2iKES4ojsxWNUGNJaEcbA==}
+    engines: {node: '>=16.13'}
+    requiresBuild: true
+    peerDependencies:
+      prisma: '*'
+    peerDependenciesMeta:
+      prisma:
+        optional: true
+    dev: false
+
   /@prisma/engines-version@4.17.0-26.6b0aef69b7cdfc787f822ecd7cdc76d5f1991584:
     resolution: {integrity: sha512-HHiUF6NixsldsP3JROq07TYBLEjXFKr6PdH8H4gK/XAoTmIplOJBCgrIUMrsRAnEuGyRoRLXKXWUb943+PFoKQ==}
     dev: false
@@ -11758,7 +11775,6 @@ packages:
   /dotenv@16.3.1:
     resolution: {integrity: sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==}
     engines: {node: '>=12'}
-    dev: true
 
   /eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
