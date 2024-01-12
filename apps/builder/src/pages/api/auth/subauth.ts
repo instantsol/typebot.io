@@ -70,8 +70,8 @@ async function NextAuthApiAutomaticHandler(
   options: AuthOptions
 ) {
   try {
-    const customkey = req.headers.customkey
-    if ((await checkPermission(customkey)) == false) {
+    const customkey = req.headers.customkey?.toString()
+    if (customkey && (await checkPermission(customkey)) == false) {
       return res.json({ url: null })
     }
   } catch (err) {
@@ -90,11 +90,11 @@ async function NextAuthApiAutomaticHandler(
   const secret = options.secret
   const user = await options.adapter?.getUserByEmail(email)
   //eslint-disable-next-line
-  const botsList = await getWorkspaceId(user?.id)
+  const botsList = user ? await getWorkspaceId(user?.id) : null
   const token = randomBytes(32).toString('hex')
 
   //eslint-disable-next-line
-  const apikey = await getApiKey(user?.id)
+  const apikey = user ? await getApiKey(user?.id) : null
   const ONE_DAY_IN_SECONDS = 86400
   const expires = new Date(Date.now() + (3600 ?? ONE_DAY_IN_SECONDS) * 1000)
 
