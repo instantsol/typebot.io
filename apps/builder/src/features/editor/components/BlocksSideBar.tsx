@@ -154,7 +154,6 @@ export const BlocksSideBar = () => {
           </SimpleGrid>
         </Stack> */}
 
-
         <Stack>
           <Text fontSize="sm" fontWeight="semibold">
             {t('editor.sidebarBlocks.blockType.inputs.heading')}
