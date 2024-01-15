@@ -130,38 +130,30 @@ export const BlocksSideBar = () => {
           </Tooltip>
         </Flex>
 
-        {/* <Stack>
-          <Text fontSize="sm" fontWeight="semibold">
-            {t('editor.sidebarBlocks.blockType.bubbles.heading')}
-          </Text>
-          <SimpleGrid columns={2} spacing="3">
-            {Object.values(BubbleBlockType).map((type) => (
-              console.log(type)
-              <BlockCard key={type} type={type} onMouseDown={handleMouseDown} />
-            ))}
-          </SimpleGrid>
-        </Stack> */}
-
         <Stack>
           <Text fontSize="sm" fontWeight="semibold">
             {t('editor.sidebarBlocks.blockType.bubbles.heading')}
           </Text>
           <SimpleGrid columns={2} spacing="3">
-            {Object.values(BubbleBlockType)
-              .filter(
-                (type, index, self) =>
-                  ['text', 'image', 'video'].includes(type) &&
-                  self.indexOf(type) === index
-              )
-              .map((filteredType) => (
-                <BlockCard
-                  key={filteredType}
-                  type={filteredType}
-                  onMouseDown={handleMouseDown}
-                />
-              ))}
+            {Object.values(BubbleBlockType).map((type) => (
+              <BlockCard key={type} type={type} onMouseDown={handleMouseDown} />
+            ))}
           </SimpleGrid>
         </Stack>
+
+        {/* <Stack>
+          <Text fontSize="sm" fontWeight="semibold">
+            {t('editor.sidebarBlocks.blockType.bubbles.heading')}
+          </Text>
+          <SimpleGrid columns={2} spacing="3">
+            {Object.values(BubbleBlockType)
+              .filter((type, index, self) => ['text', 'image', 'video'].includes(type) && self.indexOf(type) === index)
+              .map((filteredType) => (
+                <BlockCard key={filteredType} type={filteredType} onMouseDown={handleMouseDown} />
+              ))}
+          </SimpleGrid>
+        </Stack> */}
+
 
         <Stack>
           <Text fontSize="sm" fontWeight="semibold">

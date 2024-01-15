@@ -10,27 +10,28 @@ import {
   useDisclosure,
 } from '@chakra-ui/react'
 import {
-  BuoyIcon,
-  ChevronLeftIcon,
+  // BuoyIcon,
+  // ChevronLeftIcon,
   PlayIcon,
   RedoIcon,
   UndoIcon,
 } from '@/components/icons'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
-import { isDefined, isNotDefined } from '@typebot.io/lib'
+import { isNotDefined } from '@typebot.io/lib'
+// import { isDefined, isNotDefined } from '@typebot.io/lib'
 import { EditableTypebotName } from './EditableTypebotName'
 import Link from 'next/link'
 import { EditableEmojiOrImageIcon } from '@/components/EditableEmojiOrImageIcon'
 import { useUndoShortcut } from '@/hooks/useUndoShortcut'
 import { useDebouncedCallback } from 'use-debounce'
-import { ShareTypebotButton } from '@/features/share/components/ShareTypebotButton'
+// import { ShareTypebotButton } from '@/features/share/components/ShareTypebotButton'
 import { PublishButton } from '@/features/publish/components/PublishButton'
 import { headerHeight } from '../constants'
 import { RightPanel, useEditor } from '../providers/EditorProvider'
 import { useTypebot } from '../providers/TypebotProvider'
 import { SupportBubble } from '@/components/SupportBubble'
-import { isCloudProdInstance } from '@/helpers/isCloudProdInstance'
+// import { isCloudProdInstance } from '@/helpers/isCloudProdInstance'
 import { useTranslate } from '@tolgee/react'
 import { GuestTypebotHeader } from './UnauthenticatedTypebotHeader'
 
@@ -39,7 +40,7 @@ export const TypebotHeader = () => {
   const router = useRouter()
   const {
     typebot,
-    publishedTypebot,
+    // publishedTypebot,
     updateTypebot,
     save,
     undo,
@@ -60,7 +61,8 @@ export const TypebotHeader = () => {
   const hideUndoShortcutTooltipLater = useDebouncedCallback(() => {
     setUndoShortcutTooltipOpen(false)
   }, 1000)
-  const { isOpen, onOpen } = useDisclosure()
+  const { isOpen } = useDisclosure()
+  // const { isOpen, onOpen } = useDisclosure()
   const headerBgColor = useColorModeValue('white', 'gray.900')
 
   const handleNameSubmit = (name: string) =>
@@ -84,11 +86,11 @@ export const TypebotHeader = () => {
     undo()
   })
 
-  const handleHelpClick = () => {
-    isCloudProdInstance()
-      ? onOpen()
-      : window.open('https://docs.typebot.io', '_blank')
-  }
+  // const handleHelpClick = () => {
+  //   isCloudProdInstance()
+  //     ? onOpen()
+  //     : window.open('https://docs.typebot.io', '_blank')
+  // }
 
   if (currentUserMode === 'guest') return <GuestTypebotHeader />
   return (
@@ -118,7 +120,7 @@ export const TypebotHeader = () => {
         >
           {t('editor.header.flowButton.label')}
         </Button>
-        <Button
+        {/* <Button
           as={Link}
           href={`/typebots/${typebot?.id}/theme`}
           colorScheme={router.pathname.endsWith('theme') ? 'blue' : 'gray'}
@@ -126,8 +128,8 @@ export const TypebotHeader = () => {
           size="sm"
         >
           {t('editor.header.themeButton.label')}
-        </Button>
-        <Button
+        </Button> */}
+        {/* <Button
           as={Link}
           href={`/typebots/${typebot?.id}/settings`}
           colorScheme={router.pathname.endsWith('settings') ? 'blue' : 'gray'}
@@ -135,8 +137,8 @@ export const TypebotHeader = () => {
           size="sm"
         >
           {t('editor.header.settingsButton.label')}
-        </Button>
-        <Button
+        </Button> */}
+        {/* <Button
           as={Link}
           href={`/typebots/${typebot?.id}/share`}
           colorScheme={router.pathname.endsWith('share') ? 'blue' : 'gray'}
@@ -144,8 +146,8 @@ export const TypebotHeader = () => {
           size="sm"
         >
           {t('share.button.label')}
-        </Button>
-        {isDefined(publishedTypebot) && (
+        </Button> */}
+        {/* {isDefined(publishedTypebot) && (
           <Button
             as={Link}
             href={`/typebots/${typebot?.id}/results`}
@@ -155,7 +157,7 @@ export const TypebotHeader = () => {
           >
             {t('editor.header.resultsButton.label')}
           </Button>
-        )}
+        )} */}
       </HStack>
       <HStack
         pos="absolute"
@@ -165,7 +167,7 @@ export const TypebotHeader = () => {
         spacing="6"
       >
         <HStack alignItems="center" spacing={3}>
-          <IconButton
+          {/* <IconButton
             as={Link}
             aria-label="Navigate back"
             icon={<ChevronLeftIcon fontSize={25} />}
@@ -186,7 +188,7 @@ export const TypebotHeader = () => {
               },
             }}
             size="sm"
-          />
+          /> */}
           <HStack spacing={1}>
             {typebot && (
               <EditableEmojiOrImageIcon
@@ -241,9 +243,9 @@ export const TypebotHeader = () => {
               </Tooltip>
             </HStack>
           )}
-          <Button leftIcon={<BuoyIcon />} onClick={handleHelpClick} size="sm">
+          {/* <Button leftIcon={<BuoyIcon />} onClick={handleHelpClick} size="sm">
             {t('editor.header.helpButton.label')}
-          </Button>
+          </Button> */}
         </HStack>
         {isSavingLoading && (
           <HStack>
@@ -256,9 +258,9 @@ export const TypebotHeader = () => {
       </HStack>
 
       <HStack right="40px" pos="absolute" display={['none', 'flex']}>
-        <Flex pos="relative">
+        {/* <Flex pos="relative">
           <ShareTypebotButton isLoading={isNotDefined(typebot)} />
-        </Flex>
+        </Flex> */}
         {router.pathname.includes('/edit') && isNotDefined(rightPanel) && (
           <Button
             colorScheme="gray"
