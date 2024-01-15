@@ -112,7 +112,7 @@ async function NextAuthApiAutomaticHandler(
     url: _url,
     botlist: botsList,
     user: user,
-    apikey: apikey?.id,
+    apikey: apikey?.token,
   })
 }
 
