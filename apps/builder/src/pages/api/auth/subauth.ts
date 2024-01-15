@@ -37,6 +37,7 @@ async function getBot(key: string) {
   const botsResult = await prisma.typebot.findMany({
     where: {
       workspaceId: key,
+      isArchived: false,
     },
   })
   return botsResult
