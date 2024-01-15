@@ -17,7 +17,7 @@ async function getApiKey(key: string) {
   }
 }
 
-async function checkPermission(key: string) {
+export async function checkPermission(key: string) {
   try {
     const authorized = await prisma.embed.findFirst({
       where: {
@@ -72,11 +72,12 @@ async function NextAuthApiAutomaticHandler(
 ) {
   try {
     const customkey = req.headers.customkey?.toString()
-    if (customkey && (await checkPermission(customkey)) == false) {
-      return res.json({ url: null })
+    if (!customkey || (await checkPermission(customkey)) === false) {
+      
+      return res.status(407).json({ url: null })
     }
   } catch (err) {
-    return res.json({ url: null })
+    return res.status(407).json({ url: null })
   }
   const { ...query } = req.query
   const email: string = query?.email ? query.email.toString() : ''

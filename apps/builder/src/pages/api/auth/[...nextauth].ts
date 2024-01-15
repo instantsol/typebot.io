@@ -20,7 +20,6 @@ import got from 'got'
 import { env } from '@typebot.io/env'
 import * as Sentry from '@sentry/nextjs'
 import { getIp } from '@typebot.io/lib/getIp'
-import NextAuthApiAutomaticHandler from './subauth'
 
 const providers: Provider[] = []
 
@@ -198,15 +197,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   let restricted: 'rate-limited' | undefined
 
-  if (req.url?.startsWith('/api/auth/signin/automaticsignin')) {
-    console.log('chave: ', req.headers.customkey)
-    const ret = await NextAuthApiAutomaticHandler(
-      req,
-      res,
-      getAuthOptions({ restricted })
-    )
-    return ret
-  }
 
   if (
     rateLimit &&
