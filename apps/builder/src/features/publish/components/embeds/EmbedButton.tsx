@@ -97,8 +97,8 @@ export const EmbedButton = ({
 }
 
 // export const integrationsList = [
-  // (props: Pick<ModalProps, 'publicId' | 'isPublished'>) => {
-  //   const { workspace } = useWorkspace()
+// (props: Pick<ModalProps, 'publicId' | 'isPublished'>) => {
+//   const { workspace } = useWorkspace()
 
 //     return (
 //       <ParentModalProvider>
@@ -259,7 +259,7 @@ export const integrationsList = [
       {...props}
     />
   ),
-];
+]
 
 // Filter integrationsList to include only "Script" and "Iframe"
 // const filteredIntegrationsList = integrationsList.filter(
