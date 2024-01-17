@@ -138,7 +138,7 @@ export const TypebotHeader = () => {
         >
           {t('editor.header.settingsButton.label')}
         </Button> */}
-        {/* <Button
+        <Button
           as={Link}
           href={`/typebots/${typebot?.id}/share`}
           colorScheme={router.pathname.endsWith('share') ? 'blue' : 'gray'}
@@ -146,7 +146,7 @@ export const TypebotHeader = () => {
           size="sm"
         >
           {t('share.button.label')}
-        </Button> */}
+        </Button>
         {/* {isDefined(publishedTypebot) && (
           <Button
             as={Link}
