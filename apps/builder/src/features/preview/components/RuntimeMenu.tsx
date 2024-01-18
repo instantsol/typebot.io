@@ -3,8 +3,8 @@ import {
   Menu,
   MenuButton,
   Button,
-  MenuList,
-  MenuItem,
+  // MenuList,
+  // MenuItem,
   Tag,
   HStack,
   Text,
@@ -18,7 +18,8 @@ type Props = {
   onSelectRuntime: (runtime: Runtime) => void
 }
 
-export const RuntimeMenu = ({ selectedRuntime, onSelectRuntime }: Props) => {
+//export const RuntimeMenu = ({ selectedRuntime, onSelectRuntime }: Props) => {
+export const RuntimeMenu = ({ selectedRuntime }: Props) => {
   return (
     <Menu>
       <MenuButton

@@ -7,44 +7,44 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react'
 import {
-  WordpressLogo,
-  ShopifyLogo,
-  WixLogo,
-  GtmLogo,
-  JavascriptLogo,
-  ReactLogo,
-  NotionLogo,
-  WebflowLogo,
+  // WordpressLogo,
+  // ShopifyLogo,
+  // WixLogo,
+  // GtmLogo,
+  // JavascriptLogo,
+  // ReactLogo,
+  // NotionLogo,
+  // WebflowLogo,
   IframeLogo,
 } from './logos'
 import React from 'react'
 import {
-  WordpressModal,
-  ShopifyModal,
-  WebflowModal,
-  GtmModal,
-  JavascriptModal,
-  ReactModal,
-  NotionModal,
+  // WordpressModal,
+  // ShopifyModal,
+  // WebflowModal,
+  // GtmModal,
+  // JavascriptModal,
+  // ReactModal,
+  // NotionModal,
   IframeModal,
-  WixModal,
+  // WixModal,
 } from './modals'
 import { ScriptModal } from './modals/Script/ScriptModal'
-import { CodeIcon } from '@/components/icons'
-import { ApiModal } from './modals/ApiModal'
+// import { CodeIcon } from '@/components/icons'
+// import { ApiModal } from './modals/ApiModal'
 import { ScriptIcon } from '@/features/blocks/logic/script/components/ScriptIcon'
-import { FlutterFlowLogo } from './logos/FlutterFlowLogo'
-import { FlutterFlowModal } from './modals/FlutterFlowModal'
-import { NextjsLogo } from './logos/NextjsLogo'
-import { NextjsModal } from './modals/Nextjs/NextjsModal'
-import {
-  WhatsAppLogo,
-  whatsAppBrandColor,
-} from '@/components/logos/WhatsAppLogo'
-import { WhatsAppModal } from './modals/WhatsAppModal/WhatsAppModal'
-import { ParentModalProvider } from '@/features/graph/providers/ParentModalProvider'
-import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
-import { hasProPerks } from '@/features/billing/helpers/hasProPerks'
+// import { FlutterFlowLogo } from './logos/FlutterFlowLogo'
+// import { FlutterFlowModal } from './modals/FlutterFlowModal'
+// import { NextjsLogo } from './logos/NextjsLogo'
+// import { NextjsModal } from './modals/Nextjs/NextjsModal'
+// import {
+//   WhatsAppLogo,
+//   whatsAppBrandColor,
+// } from '@/components/logos/WhatsAppLogo'
+// import { WhatsAppModal } from './modals/WhatsAppModal/WhatsAppModal'
+// import { ParentModalProvider } from '@/features/graph/providers/ParentModalProvider'
+// import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
+// import { hasProPerks } from '@/features/billing/helpers/hasProPerks'
 import { LockTag } from '@/features/billing/components/LockTag'
 import { Plan } from '@typebot.io/prisma'
 
