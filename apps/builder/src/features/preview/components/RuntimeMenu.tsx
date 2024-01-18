@@ -33,8 +33,8 @@ export const RuntimeMenu = ({ selectedRuntime, onSelectRuntime }: Props) => {
           ) : null}
         </HStack>
       </MenuButton>
-      {/* <MenuList w="100px"> */}
-        {/* {runtimes
+      <MenuList w="100px" hidden>
+        {runtimes
           .filter((runtime) => runtime.name !== selectedRuntime.name)
           .map((runtime) => (
             <MenuItem
@@ -49,8 +49,8 @@ export const RuntimeMenu = ({ selectedRuntime, onSelectRuntime }: Props) => {
                 ) : null}
               </HStack>
             </MenuItem>
-          ))} */}
-      {/* </MenuList> */}
+          ))}
+      </MenuList>
     </Menu>
   )
 }
