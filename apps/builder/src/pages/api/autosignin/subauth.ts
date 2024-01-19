@@ -73,7 +73,6 @@ async function NextAuthApiAutomaticHandler(
   try {
     const customkey = req.headers.customkey?.toString()
     if (!customkey || (await checkPermission(customkey)) === false) {
-      
       return res.status(407).json({ url: null })
     }
   } catch (err) {

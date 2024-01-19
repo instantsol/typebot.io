@@ -121,7 +121,7 @@ export const integrationsList = [
         </div>
       </ParentModalProvider>
     )
-  }, 
+  },
   (props: Pick<ModalProps, 'publicId' | 'isPublished'>) => (
     <div hidden>
       <EmbedButton
