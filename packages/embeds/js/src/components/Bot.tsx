@@ -248,13 +248,15 @@ const BotContent = (props: BotContentProps) => {
           onNewLogs={props.onNewLogs}
         />
       </div>
-      <Show
-        when={
-          props.initialChatReply.typebot.settings.general?.isBrandingEnabled
-        }
-      >
-        <LiteBadge botContainer={botContainer} />
-      </Show>
+      <div hidden>
+        <Show
+          when={
+            props.initialChatReply.typebot.settings.general?.isBrandingEnabled
+          }
+        >
+            <LiteBadge botContainer={botContainer} />
+        </Show>
+      </div>
     </div>
   )
 }
