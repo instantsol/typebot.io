@@ -197,7 +197,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   let restricted: 'rate-limited' | undefined
 
-
   if (
     rateLimit &&
     req.url?.startsWith('/api/auth/signin/email') &&

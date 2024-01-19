@@ -244,7 +244,12 @@ export const TypebotHeader = () => {
               </Tooltip>
             </HStack>
           )}
-          <Button leftIcon={<BuoyIcon />} onClick={handleHelpClick} size="sm" hidden>
+          <Button
+            leftIcon={<BuoyIcon />}
+            onClick={handleHelpClick}
+            size="sm"
+            hidden
+          >
             {t('editor.header.helpButton.label')}
           </Button>
         </HStack>

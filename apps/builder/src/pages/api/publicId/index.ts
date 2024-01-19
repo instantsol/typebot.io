@@ -2,14 +2,13 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { checkPermission } from '../autosignin/subauth'
 import prisma from '@typebot.io/lib/prisma'
 
-
-async function GetUser(workspaceId: string){
+async function GetUser(workspaceId: string) {
   const workspace = await prisma.memberInWorkspace.findFirst({
     where: {
-      workspaceId: workspaceId
-    }
+      workspaceId: workspaceId,
+    },
   })
-  const user = await prisma.user.findFirst({where: {id:  workspace?.userId}})
+  const user = await prisma.user.findFirst({ where: { id: workspace?.userId } })
   return user?.email
 }
 
@@ -36,7 +35,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const publicId: string = query?.publicId ? query.publicId.toString() : ''
   const Id: string = query?.Id ? query.Id.toString() : ''
   try {
-    const customkey :string = req.headers.customkey ? req.headers.customkey.toString() : ''
+    const customkey: string = req.headers.customkey
+      ? req.headers.customkey.toString()
+      : ''
 
     if (!customkey || (await checkPermission(customkey)) === false) {
       return res.status(407).json({ botid: null })
@@ -45,24 +46,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.log(err)
     return res.status(407).json({ botid: null })
   }
-  
-  if (publicId){
+
+  if (publicId) {
     const bots = await TypeBot(publicId)
-    
+
     if (bots) {
       const user = await GetUser(bots?.workspaceId)
-      res.status(200).json({ bots: bots.id, user: user })  
+      res.status(200).json({ bots: bots.id, user: user })
     }
-  }
-  else if (Id){
+  } else if (Id) {
     const bots = await GetById(Id)
 
     if (bots) {
       const user = await GetUser(bots?.workspaceId)
-      res.status(200).json({ bots: bots.id, user: user })  
+      res.status(200).json({ bots: bots.id, user: user })
     }
   }
-
 }
 
 export default handler
