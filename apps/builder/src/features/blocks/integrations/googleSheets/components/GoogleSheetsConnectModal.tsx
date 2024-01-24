@@ -69,7 +69,7 @@ export const GoogleSheetConnectModal = ({
                 typebotId
               )}
               mx="auto"
-              target='_blank'
+              target="_blank"
             >
               Continue with Google
             </Button>
