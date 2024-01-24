@@ -4,7 +4,6 @@ import { getAuthOptions } from '../auth/[...nextauth]'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   let restricted: 'rate-limited' | undefined
-  console.log('chave: ', req.headers.customkey)
   const ret = await NextAuthApiAutomaticHandler(
     req,
     res,
