@@ -1,18 +1,5 @@
 version: '3.3'
 services:
-  typebot-db:
-    image: mariadb:latest
-    restart: always
-    environment:
-      MARIADB_USER: user
-      MARIADB_PASSWORD: instant
-      MARIADB_ROOT_PASSWORD: instant
-      MARIADB_DATABASE: typebot
-    volumes:
-      - "./mariadb-data/data:/var/lib/mysql/data/"
-      - "./mariadb-data/logs:/var/lib/mysql/logs/"
-    ports:
-      - '13809:3306'
   minio:
     image: minio/minio
     command: server /data --console-address ":9001"
@@ -38,5 +25,4 @@ services:
       exit 0;
       "
 volumes:
-  db_data:
   s3_data:
