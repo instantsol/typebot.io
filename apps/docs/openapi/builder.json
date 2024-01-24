@@ -371,6 +371,9 @@
                                                   "content": {
                                                     "type": "string"
                                                   },
+                                                  "isExecutedOnClient": {
+                                                    "type": "boolean"
+                                                  },
                                                   "shouldExecuteInParentContext": {
                                                     "type": "boolean"
                                                   }
@@ -4052,6 +4055,10 @@
                           "type": "string",
                           "nullable": true
                         },
+                        "customChatsLimit": {
+                          "type": "number",
+                          "nullable": true
+                        },
                         "customSeatsLimit": {
                           "type": "number",
                           "nullable": true
@@ -4075,6 +4082,7 @@
                         "icon",
                         "plan",
                         "stripeId",
+                        "customChatsLimit",
                         "customSeatsLimit",
                         "isSuspended",
                         "isPastDue",
@@ -6574,6 +6582,9 @@
                                               },
                                               "content": {
                                                 "type": "string"
+                                              },
+                                              "isExecutedOnClient": {
+                                                "type": "boolean"
                                               },
                                               "shouldExecuteInParentContext": {
                                                 "type": "boolean"
@@ -11096,6 +11107,9 @@
                                               "content": {
                                                 "type": "string"
                                               },
+                                              "isExecutedOnClient": {
+                                                "type": "boolean"
+                                              },
                                               "shouldExecuteInParentContext": {
                                                 "type": "boolean"
                                               }
@@ -13955,32 +13969,8 @@
                   "type": "object",
                   "properties": {
                     "resultExample": {
-                      "allOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "message": {
-                              "type": "string",
-                              "enum": [
-                                "This is a sample result, it has been generated ⬇️"
-                              ]
-                            },
-                            "Submitted at": {
-                              "type": "string"
-                            }
-                          },
-                          "required": [
-                            "message",
-                            "Submitted at"
-                          ]
-                        },
-                        {
-                          "type": "object",
-                          "additionalProperties": {
-                            "type": "string"
-                          }
-                        }
-                      ],
+                      "type": "object",
+                      "additionalProperties": {},
                       "description": "Can contain any fields."
                     }
                   },
@@ -23505,6 +23495,44 @@
                                             "document",
                                             "timestamp"
                                           ]
+                                        },
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "from": {
+                                              "type": "string"
+                                            },
+                                            "type": {
+                                              "type": "string",
+                                              "enum": [
+                                                "location"
+                                              ]
+                                            },
+                                            "location": {
+                                              "type": "object",
+                                              "properties": {
+                                                "latitude": {
+                                                  "type": "number"
+                                                },
+                                                "longitude": {
+                                                  "type": "number"
+                                                }
+                                              },
+                                              "required": [
+                                                "latitude",
+                                                "longitude"
+                                              ]
+                                            },
+                                            "timestamp": {
+                                              "type": "string"
+                                            }
+                                          },
+                                          "required": [
+                                            "from",
+                                            "type",
+                                            "location",
+                                            "timestamp"
+                                          ]
                                         }
                                       ]
                                     }
@@ -24770,6 +24798,9 @@
                       },
                       "content": {
                         "type": "string"
+                      },
+                      "isExecutedOnClient": {
+                        "type": "boolean"
                       },
                       "shouldExecuteInParentContext": {
                         "type": "boolean"
@@ -26820,7 +26851,8 @@
                   "openai",
                   "zemantic-ai",
                   "cal-com",
-                  "chat-node"
+                  "chat-node",
+                  "qr-code"
                 ]
               },
               "options": {}
@@ -27354,6 +27386,14 @@
               },
               "maxDelay": {
                 "type": "number"
+              },
+              "delayBetweenBubbles": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 5
+              },
+              "isDisabledOnFirstMessage": {
+                "type": "boolean"
               }
             }
           },
@@ -27449,6 +27489,17 @@
             "properties": {
               "isEnabled": {
                 "type": "boolean"
+              }
+            }
+          },
+          "security": {
+            "type": "object",
+            "properties": {
+              "allowedOrigins": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -28017,6 +28068,9 @@
                               },
                               "content": {
                                 "type": "string"
+                              },
+                              "isExecutedOnClient": {
+                                "type": "boolean"
                               },
                               "shouldExecuteInParentContext": {
                                 "type": "boolean"
@@ -30826,6 +30880,9 @@
                               },
                               "content": {
                                 "type": "string"
+                              },
+                              "isExecutedOnClient": {
+                                "type": "boolean"
                               },
                               "shouldExecuteInParentContext": {
                                 "type": "boolean"

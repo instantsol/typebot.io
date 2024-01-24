@@ -93,10 +93,12 @@ export const resumeWhatsAppFlow = async ({
     visitedEdges,
   } = resumeResponse
 
+  const isFirstChatChunk = (!session || isSessionExpired) ?? false
   await sendChatReplyToWhatsApp({
     to: receivedMessage.from,
     messages,
     input,
+    isFirstChatChunk,
     typingEmulation: newSessionState.typingEmulation,
     clientSideActions,
     credentials,
@@ -153,6 +155,8 @@ const getIncomingMessageContent = async ({
         env.NEXTAUTH_URL +
         `/api/typebots/${typebotId}/whatsapp/media/${mediaId}`
       )
+    case 'location':
+      return `${message.location.latitude}, ${message.location.longitude}`
   }
 }
 
