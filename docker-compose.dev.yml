@@ -1,15 +1,5 @@
 version: '3.3'
 services:
-  typebot-db:
-    image: postgres:13
-    ports:
-      - '5432:5432'
-    restart: always
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: 'typebot'
-      POSTGRES_PASSWORD: 'typebot'
   minio:
     image: minio/minio
     command: server /data --console-address ":9001"
@@ -35,5 +25,4 @@ services:
       exit 0;
       "
 volumes:
-  db_data:
   s3_data:

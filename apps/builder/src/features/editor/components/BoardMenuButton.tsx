@@ -34,7 +34,7 @@ export const BoardMenuButton = (props: FlexProps) => {
     const data =
       'data:application/json;charset=utf-8,' +
       encodeURIComponent(JSON.stringify(typebot))
-    const fileName = `typebot-export-${parseDefaultPublicId(
+    const fileName = `bot-export-${parseDefaultPublicId(
       typebot.name,
       typebot.id
     )}.json`
