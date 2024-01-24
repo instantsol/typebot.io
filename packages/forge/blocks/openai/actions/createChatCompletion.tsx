@@ -1,11 +1,14 @@
 import { option, createAction } from '@typebot.io/forge'
 import OpenAI, { ClientOptions } from 'openai'
 import { defaultOpenAIOptions } from '../constants'
-import { OpenAIStream } from 'ai'
+import { OpenAIStream, ToolCallPayload } from 'ai'
 import { parseChatCompletionMessages } from '../helpers/parseChatCompletionMessages'
 import { isDefined } from '@typebot.io/lib'
 import { auth } from '../auth'
 import { baseOptions } from '../baseOptions'
+import { ChatCompletionTool } from 'openai/resources/chat/completions'
+import { parseToolParameters } from '../helpers/parseToolParameters'
+import { executeFunction } from '@typebot.io/variables/executeFunction'
 
 const nativeMessageContentSchema = {
   content: option.string.layout({
@@ -31,6 +34,48 @@ const assistantMessageItemSchema = option
     role: option.literal('assistant'),
   })
   .extend(nativeMessageContentSchema)
+
+export const parameterSchema = option.object({
+  name: option.string.layout({
+    label: 'Name',
+    placeholder: 'myVariable',
+    withVariableButton: false,
+  }),
+  type: option.enum(['string', 'number', 'boolean']).layout({
+    label: 'Type:',
+    direction: 'row',
+  }),
+  description: option.string.layout({
+    label: 'Description',
+    withVariableButton: false,
+  }),
+  required: option.boolean.layout({
+    label: 'Is required?',
+  }),
+})
+
+const functionToolItemSchema = option.object({
+  type: option.literal('function'),
+  name: option.string.layout({
+    label: 'Name',
+    placeholder: 'myFunctionName',
+    withVariableButton: false,
+  }),
+  description: option.string.layout({
+    label: 'Description',
+    placeholder: 'A brief description of what this function does.',
+    withVariableButton: false,
+  }),
+  parameters: option.array(parameterSchema).layout({ accordion: 'Parameters' }),
+  code: option.string.layout({
+    inputType: 'code',
+    label: 'Code',
+    lang: 'javascript',
+    moreInfoTooltip:
+      'A javascript code snippet that can use the defined parameters. It should return a value.',
+    withVariableButton: false,
+  }),
+})
 
 const dialogueMessageItemSchema = option.object({
   role: option.literal('Dialogue'),
@@ -61,6 +106,9 @@ export const options = option.object({
       ])
     )
     .layout({ accordion: 'Messages', itemLabel: 'message', isOrdered: true }),
+  tools: option
+    .array(option.discriminatedUnion('type', [functionToolItemSchema]))
+    .layout({ accordion: 'Tools', itemLabel: 'tool' }),
   temperature: option.number.layout({
     accordion: 'Advanced settings',
     label: 'Temperature',
@@ -131,20 +179,78 @@ export const createChatCompletion = createAction({
 
       const openai = new OpenAI(config)
 
+      const tools = options.tools
+        ? (options.tools
+            .filter((t) => t.name && t.parameters)
+            .map((t) => ({
+              type: 'function',
+              function: {
+                name: t.name as string,
+                description: t.description,
+                parameters: parseToolParameters(t.parameters!),
+              },
+            })) satisfies ChatCompletionTool[])
+        : undefined
+
+      const messages = parseChatCompletionMessages({ options, variables })
+
       const response = await openai.chat.completions.create({
         model: options.model ?? defaultOpenAIOptions.model,
         temperature: options.temperature
           ? Number(options.temperature)
           : undefined,
-        messages: parseChatCompletionMessages({ options, variables }),
+        messages,
+        tools,
       })
+
+      let message = response.choices[0].message
+      let totalTokens = response.usage?.total_tokens
+
+      if (message.tool_calls) {
+        messages.push(message)
+
+        for (const toolCall of message.tool_calls) {
+          const name = toolCall.function?.name
+          if (!name) continue
+          const toolDefinition = options.tools?.find((t) => t.name === name)
+          if (!toolDefinition?.code || !toolDefinition.parameters) continue
+          const toolArgs = toolCall.function?.arguments
+            ? JSON.parse(toolCall.function?.arguments)
+            : undefined
+          if (!toolArgs) continue
+          const { output, newVariables } = await executeFunction({
+            variables: variables.list(),
+            args: toolArgs,
+            body: toolDefinition.code,
+          })
+          newVariables?.forEach((v) => variables.set(v.id, v.value))
+
+          messages.push({
+            tool_call_id: toolCall.id,
+            role: 'tool',
+            content: output,
+          })
+        }
+
+        const secondResponse = await openai.chat.completions.create({
+          model: options.model ?? defaultOpenAIOptions.model,
+          temperature: options.temperature
+            ? Number(options.temperature)
+            : undefined,
+          messages,
+          tools,
+        })
+
+        message = secondResponse.choices[0].message
+        totalTokens = secondResponse.usage?.total_tokens
+      }
 
       options.responseMapping?.forEach((mapping) => {
         if (!mapping.variableId) return
         if (!mapping.item || mapping.item === 'Message content')
-          variables.set(mapping.variableId, response.choices[0].message.content)
+          variables.set(mapping.variableId, message.content)
         if (mapping.item === 'Total tokens')
-          variables.set(mapping.variableId, response.usage?.total_tokens)
+          variables.set(mapping.variableId, totalTokens)
       })
     },
     stream: {
@@ -168,16 +274,72 @@ export const createChatCompletion = createAction({
 
         const openai = new OpenAI(config)
 
+        const tools = options.tools
+          ? (options.tools
+              .filter((t) => t.name && t.parameters)
+              .map((t) => ({
+                type: 'function',
+                function: {
+                  name: t.name as string,
+                  description: t.description,
+                  parameters: parseToolParameters(t.parameters!),
+                },
+              })) satisfies ChatCompletionTool[])
+          : undefined
+
+        const messages = parseChatCompletionMessages({ options, variables })
+
         const response = await openai.chat.completions.create({
           model: options.model ?? defaultOpenAIOptions.model,
           temperature: options.temperature
             ? Number(options.temperature)
             : undefined,
           stream: true,
-          messages: parseChatCompletionMessages({ options, variables }),
+          messages,
+          tools,
         })
 
-        return OpenAIStream(response)
+        return OpenAIStream(response, {
+          experimental_onToolCall: async (
+            call: ToolCallPayload,
+            appendToolCallMessage
+          ) => {
+            for (const toolCall of call.tools) {
+              const name = toolCall.func?.name
+              if (!name) continue
+              const toolDefinition = options.tools?.find((t) => t.name === name)
+              if (!toolDefinition?.code || !toolDefinition.parameters) continue
+
+              const { output } = await executeFunction({
+                variables: variables.list(),
+                args:
+                  typeof toolCall.func.arguments === 'string'
+                    ? JSON.parse(toolCall.func.arguments)
+                    : toolCall.func.arguments,
+                body: toolDefinition.code,
+              })
+
+              // TO-DO: enable once we're out of edge runtime.
+              // newVariables?.forEach((v) => variables.set(v.id, v.value))
+
+              const newMessages = appendToolCallMessage({
+                tool_call_id: toolCall.id,
+                function_name: toolCall.func.name,
+                tool_call_result: output,
+              })
+
+              return openai.chat.completions.create({
+                messages: [
+                  ...messages,
+                  ...newMessages,
+                ] as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
+                model: options.model ?? defaultOpenAIOptions.model,
+                stream: true,
+                tools,
+              })
+            }
+          },
+        })
       },
     },
   },

@@ -47,6 +47,8 @@ import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
 import { hasProPerks } from '@/features/billing/helpers/hasProPerks'
 import { LockTag } from '@/features/billing/components/LockTag'
 import { Plan } from '@typebot.io/prisma'
+import { FramerModal } from './modals/FramerModal'
+import { FramerLogo } from './logos/FramerLogo'
 
 export type ModalProps = {
   publicId: string
@@ -233,6 +235,14 @@ export const integrationsList = [
         {...props}
       />
     </div>
+  ),
+  (props: Pick<ModalProps, 'publicId' | 'isPublished'>) => (
+    <EmbedButton
+      logo={<FramerLogo height={100} width="60px" />}
+      label="Framer"
+      modal={(modalProps) => <FramerModal {...modalProps} {...props} />}
+      {...props}
+    />
   ),
   (props: Pick<ModalProps, 'publicId' | 'isPublished'>) => (
     <EmbedButton
