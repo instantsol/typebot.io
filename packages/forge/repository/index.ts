@@ -5,4 +5,5 @@ export const enabledBlocks = [
   'cal-com',
   'chat-node',
   'instantchat',
+  'qr-code',
 ] as const

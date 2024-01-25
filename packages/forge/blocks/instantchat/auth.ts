@@ -7,7 +7,7 @@ export const auth = {
     apiKey: option.string.layout({
       label: 'API key',
       isRequired: true,
-      input: 'password',
+      inputType: 'password',
       helperText: 'You can generate an API key [here](<INSERT_URL>).',
     }),
   }),

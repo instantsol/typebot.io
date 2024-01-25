@@ -1,35 +1,34 @@
 import React from 'react'
-// import { HStack, Flex, Button, useDisclosure } from '@chakra-ui/react'
-// import { Flex, useDisclosure } from '@chakra-ui/react'
-import { Flex } from '@chakra-ui/react'
-// import { HardDriveIcon, SettingsIcon } from '@/components/icons'
-// import { useUser } from '@/features/account/hooks/useUser'
-// import { isNotDefined } from '@typebot.io/lib'
-// import Link from 'next/link'
-// import { EmojiOrImageIcon } from '@/components/EmojiOrImageIcon'
-// import { useTranslate } from '@tolgee/react'
-// import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
-// import { WorkspaceDropdown } from '@/features/workspace/components/WorkspaceDropdown'
-// import { WorkspaceSettingsModal } from '@/features/workspace/components/WorkspaceSettingsModal'
+import { HStack, Flex, Button, useDisclosure } from '@chakra-ui/react'
+import { HardDriveIcon, SettingsIcon } from '@/components/icons'
+import { useUser } from '@/features/account/hooks/useUser'
+import { isNotDefined } from '@typebot.io/lib'
+import Link from 'next/link'
+import { EmojiOrImageIcon } from '@/components/EmojiOrImageIcon'
+import { useTranslate } from '@tolgee/react'
+import { useWorkspace } from '@/features/workspace/WorkspaceProvider'
+import { WorkspaceDropdown } from '@/features/workspace/components/WorkspaceDropdown'
+import { WorkspaceSettingsModal } from '@/features/workspace/components/WorkspaceSettingsModal'
 
 export const DashboardHeader = () => {
-  // const { t } = useTranslate()
-  // const { user, logOut } = useUser()
-  // const { workspace, switchWorkspace, createWorkspace } = useWorkspace()
+  const { t } = useTranslate()
+  const { user, logOut } = useUser()
+  const { workspace, switchWorkspace, createWorkspace } = useWorkspace()
 
-  // const { isOpen, onOpen, onClose } = useDisclosure()
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
-  // const handleCreateNewWorkspace = () =>
-  //   createWorkspace(user?.name ?? undefined)
+  const handleCreateNewWorkspace = () =>
+    createWorkspace(user?.name ?? undefined)
 
   return (
     <Flex w="full" borderBottomWidth="1px" justify="center">
-      {/* <Flex
+      <Flex
         justify="space-between"
         alignItems="center"
         h="16"
         maxW="1000px"
         flex="1"
+        hidden
       >
         <Link href="/typebots" data-testid="typebot-logo">
           <EmojiOrImageIcon
@@ -61,7 +60,7 @@ export const DashboardHeader = () => {
             onWorkspaceSelected={switchWorkspace}
           />
         </HStack>
-      </Flex> */}
+      </Flex>
     </Flex>
   )
 }

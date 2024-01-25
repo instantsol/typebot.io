@@ -25,8 +25,14 @@ export const queueJoin = createAction({
             return {
               args: {},
               content: `
-              console.log("Buitton from Wait event ?? ", button);
-              button.addEventListener('click', () => continueFlow('CU'));
+              // console.log("Buitton from Wait event ?? ", button);
+              // button.addEventListener('click', () => continueFlow('CU'));
+              // window.document.addEventListener('endChat', (e) => {
+              // window.addEventListener('endChat', (e) => {
+              window.addEventListener('message', function (event) {
+                  console.log("DELETEME: endChat ", event);
+                  continueFlow('cu');
+              })
               
               `,
             }
@@ -35,33 +41,37 @@ export const queueJoin = createAction({
         parseInitFunction: ({ options }) => {
           return {
             args: {},
+            //             content: `
+            //             console.log('DELETEME: oi', typebotElement);
+            //             const fragment = document.createDocumentFragment();
+            //             const li = fragment
+            //   .appendChild(document.createElement("section"))
+            //   .appendChild(document.createElement("ul"))
+            //   .appendChild(document.createElement("li"));
+            // li.textContent = "VAITOMARNOCU2";
+            //             //window.document.head.appendChild(document.createElement('h1')).textContent = 'VAITOMARNOCU';
+            //             typebotElement.appendChild(document.createElement('h1')).textContent = 'VAITOMARNOCU';
+            //             window.document.body.appendChild(li)
+            //             const tau = function() {
+            //               alert('tau');
+            //             }
+            //             button = document.createElement('button');
+
+            //             // Set the text content of the button to "send"
+            //             button.textContent = 'send';
+
+            //             // Add a click event listener to the button that calls the tau() function
+            //             typebotElement.appendChild(button)
+
+            //             // Append the button to the body of the document
+
+            //             console.log('DELETEME: Tau', button);
+
+            //             `,
             content: `
-            console.log('DELETEME: oi', typebotElement);
-            const fragment = document.createDocumentFragment();
-            const li = fragment
-  .appendChild(document.createElement("section"))
-  .appendChild(document.createElement("ul"))
-  .appendChild(document.createElement("li"));
-li.textContent = "VAITOMARNOCU2";
-            //window.document.head.appendChild(document.createElement('h1')).textContent = 'VAITOMARNOCU';
-            typebotElement.appendChild(document.createElement('h1')).textContent = 'VAITOMARNOCU';
-            window.document.body.appendChild(li)
-            const tau = function() {
-              alert('tau');
-            }
-            button = document.createElement('button');
-
-            // Set the text content of the button to "send"
-            button.textContent = 'send';
-
-            // Add a click event listener to the button that calls the tau() function
-            typebotElement.appendChild(button)
-
-            // Append the button to the body of the document
-
-            console.log('DELETEME: Tau', button);
-
-            
+            const iframe = document.createElement('iframe');
+            iframe.src = 'https://dev02.instantsandbox.net/builder_chat/5e00b335cc40c489c4253eb6952eaae039bca62e/';
+            typebotElement.appendChild(iframe); 
             `,
           }
         },
