@@ -10,3 +10,12 @@ export const baseAuthOptions = option.object({
     isRequired: true,
   }),
 })
+
+export const baseOptions = option.object({
+  botAccountcode: option.string.layout({
+    label: 'Conta',
+    placeholder: '123456',
+    defaultValue: 'hmpft',
+    accordion: 'Caralhas ',
+  }),
+})

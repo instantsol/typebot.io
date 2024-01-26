@@ -1226,6 +1226,9 @@ importers:
       '@typebot.io/lib':
         specifier: workspace:*
         version: link:../../../lib
+      '@typebot.io/schemas':
+        specifier: workspace:*
+        version: link:../../../schemas
       '@typebot.io/tsconfig':
         specifier: workspace:*
         version: link:../../../tsconfig
