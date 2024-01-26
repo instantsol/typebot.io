@@ -1,26 +1,46 @@
 import { createAction, option } from '@typebot.io/forge'
+import { isDefined } from '@typebot.io/lib'
 // import { baseOptions } from '../baseOptions'
 // import { defaultBaseUrl } from '../constants'
 
 export const queueJoin = createAction({
   name: 'Queue join',
   options: option.object({
-    cuResponse: option.string.layout({
-      label: 'CuSResponse',
-      inputType: 'variableDropdown',
+    queue: option.string.layout({
+      label: 'Queue ID',
+      moreInfoTooltip:
+        'Informe o código da fila ou escolha a variável que contém essa informação.',
+    }),
+    page_id: option.string.layout({
+      label: 'Page ID',
+      defaultValue: '{{page_id}}',
+    }),
+    sender_id: option.string.layout({
+      label: 'Sender ID',
+      defaultValue: '{{sender_id}}',
+    }),
+    responseMapping: option
+      .saveResponseArray(['Message'] as const)
+      .layout({
+        accordion: 'Save response',
     }),
   }),
-  getSetVariableIds: ({ cuResponse }) => (cuResponse ? [cuResponse] : []),
+  getSetVariableIds: ({ responseMapping }) =>
+    responseMapping?.map((r) => r.variableId).filter(isDefined) ?? [],
 
   run: {
-    server: async ({ options: { cuResponse }, variables }) => {
-      console.log('DELETEME: cuResponse', cuResponse)
+    server: async ({ options: { queue, page_id, sender_id, responseMapping }, variables, credentials }) => {
+      console.log('DELETEME: queue', queue)
+      console.log('DELETEME: page_id', page_id)
+      console.log('DELETEME: sender_id', sender_id)
+      console.log('DELETEME: cuResponse', responseMapping)
       console.log('DELETEME: variables', variables)
+      console.log('DELETEME: credentials', credentials)
     },
     web: {
       displayEmbedBubble: {
         waitForEvent: {
-          getSaveVariableId: ({ cuResponse }) => cuResponse,
+          getSaveVariableId: ({ responseMapping }) => responseMapping,
           parseFunction: () => {
             return {
               args: {},
@@ -70,7 +90,7 @@ export const queueJoin = createAction({
             //             `,
             content: `
             const iframe = document.createElement('iframe');
-            iframe.src = 'https://dev02.instantsandbox.net/builder_chat/5e00b335cc40c489c4253eb6952eaae039bca62e/';
+            iframe.src = 'https://dev02.instantsandbox.net/builder_chat/348f1e52649e9a9b53371f06a289c1829320b3da/';
             typebotElement.appendChild(iframe); 
             `,
           }
