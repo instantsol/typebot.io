@@ -59,8 +59,11 @@ export const queueJoin = createAction({
           return {
             args: {},
             content: `
+              typebotElement.style.overflow = 'hidden';
               const iframe = document.createElement('iframe');
               iframe.src = '${url}';
+              iframe.style.height = '500px';
+              iframe.style.width = '100%';
               typebotElement.appendChild(iframe); 
             `,
           }
