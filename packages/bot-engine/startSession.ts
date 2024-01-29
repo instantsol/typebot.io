@@ -24,7 +24,7 @@ import { findTypebot } from './queries/findTypebot'
 import { findPublicTypebot } from './queries/findPublicTypebot'
 import { findResult } from './queries/findResult'
 import { startBotFlow } from './startBotFlow'
-import { prefillVariables } from '@typebot.io/variables/prefillVariables'
+import { prefillAddVariables } from '@typebot.io/variables/prefillVariables'
 import { deepParseVariables } from '@typebot.io/variables/deepParseVariables'
 import { injectVariablesFromExistingResult } from '@typebot.io/variables/injectVariablesFromExistingResult'
 import { getNextGroup } from './getNextGroup'
@@ -71,7 +71,7 @@ export const startSession = async ({
   const prefilledVariables =
     //startParams.type === 'live' && startParams.prefilledVariables
     startParams.prefilledVariables
-      ? prefillVariables(typebot.variables, startParams.prefilledVariables)
+      ? prefillAddVariables(typebot.variables, startParams.prefilledVariables)
       : typebot.variables
 
   const result = await getResult({

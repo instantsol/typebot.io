@@ -72,13 +72,6 @@ export async function startChatQuery({
   const typebotId = typeof typebot === 'string' ? typebot : typebot.id
   if (isPreview) {
     try {
-      prefilledVariables.id_cliente = '456'
-      console.log(
-        'DELETEME: START CHAT PREVIEWWWWWWWWWWWWW',
-        startFrom,
-        typebotId,
-	prefilledVariables
-      )
       const data = await ky
         .post(
           `${
@@ -103,8 +96,6 @@ export async function startChatQuery({
   }
 
   try {
-    console.log('DELETEME: NO PREFILLED ON PREVIEW ???', prefilledVariables)
-    prefilledVariables.id_cliente = '123'
     const data = await ky
       .post(
         `${

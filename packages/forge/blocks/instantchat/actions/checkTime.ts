@@ -25,9 +25,6 @@ export const checkTime = createAction({
       variables,
     }) => {
       const { baseUrl } = credentials
-      variables.list().forEach((v) => console.log('DELETEME: v', v))
-      console.log('DELETEME: Account ?? ', botAccountcode)
-      console.log('DELETEME: Checktim ?? ', checktime)
 
       const accountcode = variables
         .list()
