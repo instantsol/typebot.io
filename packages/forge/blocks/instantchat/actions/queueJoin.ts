@@ -13,11 +13,11 @@ export const queueJoin = createAction({
     }),
     page_id: option.string.layout({
       label: 'Page ID',
-      defaultValue: '{{page_id}}',
+      defaultValue: '{{id_chatbot}}',
     }),
     sender_id: option.string.layout({
       label: 'Sender ID',
-      defaultValue: '{{sender_id}}',
+      defaultValue: '{{id_cliente}}',
     }),
     responseMapping: option
       .saveResponseArray(['Message'] as const)
@@ -29,13 +29,14 @@ export const queueJoin = createAction({
     responseMapping?.map((r) => r.variableId).filter(isDefined) ?? [],
 
   run: {
-    server: async ({ options: { queue, page_id, sender_id, responseMapping }, variables, credentials }) => {
-      console.log('DELETEME: queue', queue)
-      console.log('DELETEME: page_id', page_id)
-      console.log('DELETEME: sender_id', sender_id)
-      console.log('DELETEME: cuResponse', responseMapping)
-      console.log('DELETEME: variables', variables)
-      console.log('DELETEME: credentials', credentials)
+    server: async ({ options: { queue, responseMapping }, variables, credentials }) => {
+      console.log(variables.list())
+      const id_chatbot = variables.list().find((v) => v.name === 'id_chatbot')?.value
+      const id_cliente = variables.list().find((v) => v.name === 'id_cliente')?.value
+      const response = await fetch(`${credentials.baseUrl}/queue_join?queue=${queue}&page_id=${id_chatbot}&sender_id=${id_cliente}`, {
+        method: 'POST',
+      })
+      console.log(response)
     },
     web: {
       displayEmbedBubble: {
