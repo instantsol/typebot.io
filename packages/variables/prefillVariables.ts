@@ -1,5 +1,6 @@
 import { safeStringify } from '@typebot.io/lib/safeStringify'
 import { StartChatInput, Variable } from '@typebot.io/schemas'
+import { createId } from '@paralleldrive/cuid2'
 
 export const prefillVariables = (
   variables: Variable[],
@@ -13,3 +14,29 @@ export const prefillVariables = (
       value: safeStringify(prefilledVariable),
     }
   })
+
+export const prefillAddVariables = (
+  variables: Variable[],
+  prefilledVariables: NonNullable<StartChatInput['prefilledVariables']>
+): Variable[] => {
+  const ret = variables.map((variable) => {
+    const prefilledVariable = prefilledVariables[variable.name]
+    if (!prefilledVariable) return variable
+    prefilledVariables[variable.name] = null
+    return {
+      ...variable,
+      value: safeStringify(prefilledVariable),
+    }
+  })
+  const rest = Object.keys(prefilledVariables)
+    .filter((k) => prefilledVariables[k] !== null)
+    .map((k) => {
+      return {
+        id: 'v' + createId(),
+        name: k,
+        value: prefilledVariables[k],
+      }
+    })
+
+  return ret.concat(rest)
+}
