@@ -232,6 +232,18 @@ export const startPreviewChatInputSchema = z.object({
     .describe(
       'If set to `true`, it will only register the session and not start the bot. This is used for 3rd party chat platforms as it can require a session to be registered before sending the first message.'
     ),
+  prefilledVariables: z
+    .record(z.unknown())
+    .optional()
+    .describe(
+      '[More info about prefilled variables.](../../editor/variables#prefilled-variables)'
+    )
+    .openapi({
+      example: {
+        'First name': 'John',
+        Email: 'john@gmail.com',
+      },
+    }),
   typebot: startTypebotSchema
     .optional()
     .describe(

@@ -69,7 +69,8 @@ export const startSession = async ({
   const typebot = await getTypebot(startParams)
 
   const prefilledVariables =
-    startParams.type === 'live' && startParams.prefilledVariables
+    //startParams.type === 'live' && startParams.prefilledVariables
+    startParams.prefilledVariables
       ? prefillVariables(typebot.variables, startParams.prefilledVariables)
       : typebot.variables
 
