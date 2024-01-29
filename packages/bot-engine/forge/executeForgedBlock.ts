@@ -152,10 +152,12 @@ export const executeForgedBlock = async (
           content: {
             initFunction: action.run.web.displayEmbedBubble.parseInitFunction({
               options: parsedOptions,
+              variables: variables
             }),
             waitForEventFunction:
               action.run.web.displayEmbedBubble.waitForEvent?.parseFunction?.({
                 options: parsedOptions,
+                variables: variables
               }),
           },
         }
