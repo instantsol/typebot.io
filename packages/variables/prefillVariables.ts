@@ -19,7 +19,7 @@ export const prefillAddVariables = (
   variables: Variable[],
   prefilledVariables: NonNullable<StartChatInput['prefilledVariables']>
 ): Variable[] => {
-  const ret = variables.map((variable) => {
+  var ret = variables.map((variable) => {
     const prefilledVariable = prefilledVariables[variable.name]
     if (!prefilledVariable) return variable
     prefilledVariables[variable.name] = null
@@ -28,10 +28,10 @@ export const prefillAddVariables = (
       value: safeStringify(prefilledVariable),
     }
   })
-  const rest = Object.keys(prefilledVariables)
+  var rest = Object.keys(prefilledVariables)
     .filter((k) => prefilledVariables[k] !== null)
     .map((k) => {
-      return {
+      return <Variable>{
         id: 'v' + createId(),
         name: k,
         value: prefilledVariables[k],
