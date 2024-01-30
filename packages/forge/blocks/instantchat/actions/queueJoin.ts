@@ -10,14 +10,6 @@ export const queueJoin = createAction({
       moreInfoTooltip:
         'Informe o código da fila ou escolha a variável que contém essa informação.',
     }),
-    page_id: option.string.layout({
-      label: 'Page ID',
-      defaultValue: '{{id_chatbot}}',
-    }),
-    sender_id: option.string.layout({
-      label: 'Sender ID',
-      defaultValue: '{{id_cliente}}',
-    }),
     responseMapping: option
       .saveResponseArray(['Message'] as const)
       .layout({
