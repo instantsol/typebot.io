@@ -33,13 +33,8 @@ export const queueJoin = createAction({
             return {
               args: {},
               content: `
-                // console.log("Buitton from Wait event ?? ", button);
-                // button.addEventListener('click', () => continueFlow('CU'));
-                // window.document.addEventListener('endChat', (e) => {
-                // window.addEventListener('endChat', (e) => {
                 window.addEventListener('message', function (event) {
-                    console.log("DELETEME: endChat ", event);
-                    continueFlow('cu');
+                    continueFlow('Chat encerrado pelo operador');
                 })
               `,
             }
