@@ -38,11 +38,12 @@ export const checkTime = createAction({
         })
         process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
-        const url = `${baseUrl}/webhook/checktime?${params.toString()}`
+        const url = `${baseUrl}/ivci/webhook/checktime?${params.toString()}`
         const response = await fetch(url, { method: 'POST' })
         if (response.status < 300 && response.status >= 200) {
           const res = await response.json()
           result = res.Checktime
+          console.log('DELETEME: Got Checktime result ', res)
         }
       }
 

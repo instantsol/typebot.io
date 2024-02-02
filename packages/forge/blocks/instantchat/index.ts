@@ -1,7 +1,7 @@
 import { createBlock } from '@typebot.io/forge'
 import { InstantchatLogo } from './logo'
 import { auth } from './auth'
-// import { queueJoin } from './actions/queueJoin'
+import { queueJoin } from './actions/queueJoin'
 import { checkTime } from './actions/checkTime'
 
 export const instantchat = createBlock({
@@ -10,6 +10,5 @@ export const instantchat = createBlock({
   tags: [],
   LightLogo: InstantchatLogo,
   auth,
-  // actions: [queueJoin, checkTime],
-  actions: [checkTime],
+  actions: [queueJoin, checkTime],
 })

@@ -1,6 +1,5 @@
 import { createAction, option } from '@typebot.io/forge'
 import { isDefined } from '@typebot.io/lib'
-import { defaultInstantchatOptions } from '../constants'
 
 export const queueJoin = createAction({
   name: 'Queue join',
@@ -10,20 +9,39 @@ export const queueJoin = createAction({
       moreInfoTooltip:
         'Informe o código da fila ou escolha a variável que contém essa informação.',
     }),
-    responseMapping: option
-      .saveResponseArray(['Message'] as const)
-      .layout({
-        accordion: 'Save response',
+    // responseMapping: option.saveResponseArray(['Message'] as const).layout({
+    //   accordion: 'Save response',
+    // }),
+    responseMapping: option.string.layout({
+      label: 'Save response',
+      inputType: 'variableDropdown',
     }),
   }),
   getSetVariableIds: ({ responseMapping }) =>
-    responseMapping?.map((r) => r.variableId).filter(isDefined) ?? [],
+    responseMapping ? [responseMapping] : [],
+  // responseMapping?.map((r) => r.variableId).filter(isDefined) ?? [],
   run: {
-    server: async ({ options: { queue, responseMapping }, variables, credentials }) => {
-      const id_chatbot = variables.list().find((v) => v.name === 'id_chatbot')?.value
-      const id_cliente = variables.list().find((v) => v.name === 'id_cliente')?.value
-      const url = `${credentials.baseUrl}/queue_join?queue=${queue}&page_id=${id_chatbot}&sender_id=${id_cliente}`
-      await fetch(url, { method: 'POST', })
+    server: async ({
+      options: { queue, responseMapping },
+      variables,
+      credentials,
+    }) => {
+      const { baseUrl } = credentials
+      const id_chatbot = variables
+        .list()
+        .find((v) => v.name === 'id_chatbot')?.value
+      const id_cliente = variables
+        .list()
+        .find((v) => v.name === 'id_cliente')?.value
+      const url = `${baseUrl}/ivci/webhook/queue_join?queue=${queue}&page_id=${id_chatbot}&sender_id=${id_cliente}`
+      console.log('DELETEME: QueueJoin URL ', url)
+      const response = await fetch(url, { method: 'POST' })
+      console.log('DELETEME: Reponse queuejoin ', response.status)
+      if (response.status < 300 && response.status >= 200) {
+        const res = await response.json()
+        console.log('DELETEME: Got queueJoin result ', res)
+        // variables.set(responseMapping, res)
+      }
     },
     web: {
       displayEmbedBubble: {
@@ -40,9 +58,20 @@ export const queueJoin = createAction({
             }
           },
         },
-        parseInitFunction: ({ options, variables }) => {
-          const hash = variables.list().find((v) => v.name === 'id_atendimento')?.value
-          const url = `${defaultInstantchatOptions.baseBuilderChatUrl}/${hash}/`
+        parseInitFunction: ({ options, variables, credentials }) => {
+          const { baseUrl } = credentials
+          console.log(
+            'DELETEME: ParseInitiFunction queueJoin',
+            options,
+            variables,
+            credentials
+          )
+
+          const hash = variables
+            .list()
+            .find((v) => v.name === 'id_atendimento')?.value
+          const url = `${baseUrl}/builder_chat/${hash}/`
+          console.log('DELETEME: Load URL ', url)
           return {
             args: {},
             content: `
