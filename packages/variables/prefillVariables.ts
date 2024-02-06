@@ -34,7 +34,7 @@ export const prefillAddVariables = (
       return <Variable>{
         id: 'v' + createId(),
         name: k,
-        value: prefilledVariables[k],
+        value: safeStringify(prefilledVariables[k]),
       }
     })
 
