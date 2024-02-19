@@ -51,9 +51,11 @@ export const queueJoin = createAction({
             return {
               args: {},
               content: `
-                window.addEventListener('message', function (event) {
-                    continueFlow('Chat encerrado pelo operador');
-                })
+              window.addEventListener('message', function (event) {
+                if (event && 'kwikEvent' in event.data && event.data.kwikEvent === 'close-chat'){
+                  continueFlow('Chat encerrado pelo operador');
+                }
+            })
               `,
             }
           },
