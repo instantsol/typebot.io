@@ -138,7 +138,6 @@ export const TypebotHeader = () => {
           colorScheme={router.pathname.endsWith('theme') ? 'blue' : 'gray'}
           variant={router.pathname.endsWith('theme') ? 'outline' : 'ghost'}
           size="sm"
-          hidden
         >
           {t('editor.header.themeButton.label')}
         </Button>
