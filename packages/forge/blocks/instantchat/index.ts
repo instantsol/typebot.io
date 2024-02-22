@@ -6,7 +6,7 @@ import { checkTime } from './actions/checkTime'
 
 export const instantchat = createBlock({
   id: 'instantchat' as const,
-  name: 'InstantChat',
+  name: 'InstantAIO',
   tags: [],
   LightLogo: InstantchatLogo,
   auth,
