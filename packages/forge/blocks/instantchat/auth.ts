@@ -3,6 +3,6 @@ import { baseAuthOptions } from './baseOptions'
 
 export const auth = {
   type: 'encryptedCredentials',
-  name: 'InstantChat account',
+  name: 'InstantAIO account',
   schema: baseAuthOptions,
 } satisfies AuthDefinition
