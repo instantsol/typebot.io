@@ -147,6 +147,7 @@ export const TypebotHeader = () => {
           colorScheme={router.pathname.endsWith('settings') ? 'blue' : 'gray'}
           variant={router.pathname.endsWith('settings') ? 'outline' : 'ghost'}
           size="sm"
+          hidden
         >
           {t('editor.header.settingsButton.label')}
         </Button>
@@ -166,6 +167,7 @@ export const TypebotHeader = () => {
             colorScheme={router.pathname.includes('results') ? 'blue' : 'gray'}
             variant={router.pathname.includes('results') ? 'outline' : 'ghost'}
             size="sm"
+            hidden
           >
             {t('editor.header.resultsButton.label')}
           </Button>
@@ -200,6 +202,7 @@ export const TypebotHeader = () => {
               },
             }}
             size="sm"
+            hidden
           />
           <HStack spacing={1}>
             {typebot && (
@@ -263,7 +266,12 @@ export const TypebotHeader = () => {
               </Tooltip>
             </HStack>
           )}
-          <Button leftIcon={<BuoyIcon />} onClick={handleHelpClick} size="sm">
+          <Button
+            leftIcon={<BuoyIcon />}
+            onClick={handleHelpClick}
+            size="sm"
+            hidden
+          >
             {t('editor.header.helpButton.label')}
           </Button>
         </HStack>
@@ -278,7 +286,7 @@ export const TypebotHeader = () => {
       </HStack>
 
       <HStack right="40px" pos="absolute" display={['none', 'flex']}>
-        <Flex pos="relative">
+        <Flex pos="relative" hidden>
           <ShareTypebotButton isLoading={isNotDefined(typebot)} />
         </Flex>
         {router.pathname.includes('/edit') && isNotDefined(rightPanel) && (

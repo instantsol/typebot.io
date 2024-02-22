@@ -2,6 +2,7 @@
 import { elevenlabs } from '@typebot.io/elevenlabs-block'
 import { difyAi } from '@typebot.io/dify-ai-block'
 import { mistral } from '@typebot.io/mistral-block'
+import { instantchat } from '@typebot.io/instantchat-block'
 import { qrCode } from '@typebot.io/qrcode-block'
 import { chatNode } from '@typebot.io/chat-node-block'
 import { calCom } from '@typebot.io/cal-com-block'
@@ -20,6 +21,7 @@ export const forgedBlocks = [
   zemanticAi,
   calCom,
   chatNode,
+  instantchat,
   qrCode,
   difyAi,
   mistral,

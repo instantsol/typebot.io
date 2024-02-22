@@ -17,24 +17,16 @@ import {
   SettingsIcon,
 } from '@/components/icons'
 import { useTypebot } from '../providers/TypebotProvider'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { EditorSettingsModal } from './EditorSettingsModal'
 import { parseDefaultPublicId } from '@/features/publish/helpers/parseDefaultPublicId'
 import { useTranslate } from '@tolgee/react'
-import { useUser } from '@/features/account/hooks/useUser'
-import { useRouter } from 'next/router'
 
 export const BoardMenuButton = (props: FlexProps) => {
-  const { query } = useRouter()
   const { typebot } = useTypebot()
-  const { user } = useUser()
   const [isDownloading, setIsDownloading] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const { t } = useTranslate()
-
-  useEffect(() => {
-    if (user && !user.graphNavigation && !query.isFirstBot) onOpen()
-  }, [onOpen, query.isFirstBot, user, user?.graphNavigation])
 
   const downloadFlow = () => {
     assert(typebot)
@@ -42,7 +34,7 @@ export const BoardMenuButton = (props: FlexProps) => {
     const data =
       'data:application/json;charset=utf-8,' +
       encodeURIComponent(JSON.stringify(typebot))
-    const fileName = `typebot-export-${parseDefaultPublicId(
+    const fileName = `bot-export-${parseDefaultPublicId(
       typebot.name,
       typebot.id
     )}.json`
