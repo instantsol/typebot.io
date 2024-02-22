@@ -67,10 +67,13 @@ export type ActionDefinition<
           ) => string | undefined
           parseFunction: (params: {
             options: z.infer<BaseOptions> & z.infer<Options>
+            variables: VariableStore
           }) => FunctionToExecute
         }
         parseInitFunction: (params: {
           options: z.infer<BaseOptions> & z.infer<Options>
+          variables: VariableStore
+          credentials: CredentialsFromAuthDef<A>
         }) => FunctionToExecute
       }
       parseFunction?: (params: {
