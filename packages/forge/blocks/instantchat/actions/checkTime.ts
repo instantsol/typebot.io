@@ -21,7 +21,7 @@ export const checkTime = createAction({
   run: {
     server: async ({
       credentials,
-      options: { botAccountcode, checktime, responseMapping },
+      options: { checktime, responseMapping },
       variables,
     }) => {
       const { baseUrl } = credentials
