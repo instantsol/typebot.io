@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react'
 import assert from 'assert'
 import {
-  BookIcon,
+  //BookIcon,
   DownloadIcon,
   MoreVerticalIcon,
   SettingsIcon,
@@ -44,10 +44,11 @@ export const BoardMenuButton = (props: FlexProps) => {
     linkElement.click()
     setIsDownloading(false)
   }
-
+  /* prettier-ignore */
+  {/*
   const redirectToDocumentation = () =>
     window.open('https://docs.typebot.io/editor/graph', '_blank')
-
+  */}
   return (
     <Flex
       bgColor={useColorModeValue('white', 'gray.900')}
@@ -64,9 +65,11 @@ export const BoardMenuButton = (props: FlexProps) => {
           bgColor={useColorModeValue('white', undefined)}
         />
         <MenuList>
+          {/* 
           <MenuItem icon={<BookIcon />} onClick={redirectToDocumentation}>
             {t('editor.graph.menu.documentationItem.label')}
           </MenuItem>
+          */}
           <MenuItem icon={<SettingsIcon />} onClick={onOpen}>
             {t('editor.graph.menu.editorSettingsItem.label')}
           </MenuItem>
@@ -78,4 +81,5 @@ export const BoardMenuButton = (props: FlexProps) => {
       </Menu>
     </Flex>
   )
+  /* prettier-ignore */
 }
