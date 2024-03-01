@@ -1,6 +1,7 @@
 import { createAction, option } from '@typebot.io/forge'
 import { isDefined } from '@typebot.io/lib'
 import { baseOptions } from '../baseOptions'
+import { defaultCortexOptions } from '../constants'
 
 export const cortex = createAction({
   name: 'Cortex',
@@ -16,20 +17,19 @@ export const cortex = createAction({
     }),
     initialMessage: option.string.layout({
       label: 'MensagemInicial',
-      defaultValue:
-        'Me diga o que você deseja. A qualquer momento, para sair digite #fim, ou #atendimento para ser transferido para um humano.',
+      defaultValue: defaultCortexOptions.initialMessage,
     }),
     endCmd: option.string.layout({
       label: 'Comando de fim',
-      defaultValue: '#fim',
+      defaultValue: defaultCortexOptions.endCmd,
     }),
     agentCmd: option.string.layout({
       label: 'Comando de atendimento',
-      defaultValue: '#atendimento',
+      defaultValue: defaultCortexOptions.agentCmd,
     }),
     retries: option.number.layout({
       label: 'Tentativas',
-      defaultValue: 3,
+      defaultValue: defaultCortexOptions.retries,
     }),
 
     responseMapping: option.string.layout({
@@ -40,20 +40,25 @@ export const cortex = createAction({
   getSetVariableIds: ({ responseMapping }) =>
     responseMapping ? [responseMapping] : [],
   run: {
-    server: async ({
-      credentials,
-      options: {
-        knowledgeBase,
-        cortexUser,
-        initialMessage,
-        endCmd,
-        agentCmd,
-        retries,
-      },
-      variables,
-    }) => {
-      let { cortexToken, baseUrl } = credentials
-      console.log('DELETEME: Cortex server run !')
+    server: async ({ credentials, options, variables }) => {
+      let { cortexToken, baseUrl, cortexUrl } = credentials
+      const { knowledgeBase, cortexUser } = options
+      const initialMessage = options.initialMessage
+        ? options.initialMessage
+        : defaultCortexOptions.initialMessage
+      const endCmd = options.endCmd
+        ? options.endCmd
+        : defaultCortexOptions.endCmd
+      const agentCmd = options.agentCmd
+        ? options.agentCmd
+        : defaultCortexOptions.agentCmd
+      const retries = options.retries
+        ? options.retries
+        : defaultCortexOptions.retries
+
+      console.log(
+        'DELETEME: Cortex server run 00000000000000000000000000000000000000000000000000000000 !'
+      )
 
       const id_chatbot = variables
         .list()
@@ -72,17 +77,29 @@ export const cortex = createAction({
       if (
         knowledgeBase &&
         baseUrl &&
+        cortexUrl &&
         cortexToken &&
         id_chatbot &&
         id_cliente &&
-        initialMessage
+        initialMessage &&
+        endCmd &&
+        agentCmd &&
+        retries
       ) {
+        const parsedUser = JSON.parse(cortexUser!)
         const params = new URLSearchParams({
           page_id: id_chatbot.toString(),
-          user_id: id_cliente.toString(),
+          sender_id: id_cliente.toString(),
           knowledge_base: knowledgeBase.toString(),
-          // username: cortexUser.email,
+          username: parsedUser.email,
+          user_id: parsedUser.id,
           initial_message: initialMessage.toString(),
+          cmd_fim: endCmd.toString(),
+          cmd_atendimento: agentCmd.toString(),
+          retry: retries.toString(),
+          assistant_token: cortexToken,
+          assistant_url: cortexUrl,
+          // original_retry: retries.toString(),
         })
         process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
@@ -114,7 +131,7 @@ export const cortex = createAction({
       } else {
         console.log('DELETEME: Missing stuffs')
         console.log(
-          `knowledgeBase: ${knowledgeBase} baseUrl: ${baseUrl} cortexToken: ${cortexToken}  id_chatbot: ${id_chatbot} id_cliente: ${id_cliente} accountcode: ${accountcode}`
+          `knowledgeBase: ${knowledgeBase} baseUrl: ${baseUrl} cortexToken: ${cortexToken}  id_chatbot: ${id_chatbot} id_cliente: ${id_cliente} initialMessage: ${initialMessage} endCmd: ${endCmd} agentCmd: ${agentCmd} retries: ${retries}`
         )
       }
     },
