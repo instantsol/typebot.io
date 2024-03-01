@@ -4,7 +4,7 @@ import { JavascriptStandardSnippet } from '../../Javascript/JavascriptStandardSn
 export const FramerStandardInstructions = () => (
   <OrderedList spacing={4} pl={5}>
     <ListItem>
-      Precione <Code>A</Code> para abrir o painel{' '}
+      Pressione <Code>A</Code> para abrir o painel{' '}
       <Code>Adicionar Elementos</Code>
     </ListItem>
     <ListItem>
