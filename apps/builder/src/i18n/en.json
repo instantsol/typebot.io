@@ -451,7 +451,7 @@
   "timeSince.months": "{count} months ago",
   "timeSince.seconds": "{count}s ago",
   "timeSince.years": "{count} years ago",
-  "typebots.defaultName": "My typebot",
+  "typebots.defaultName": "My bot",
   "update": "Update",
   "upgrade": "Upgrade",
   "variables.button.searchInput.placeholder": "Search for a variable",
