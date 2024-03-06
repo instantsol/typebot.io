@@ -21,7 +21,7 @@ export const checkTime = createAction({
   run: {
     server: async ({
       credentials,
-      options: { botAccountcode, checktime, responseMapping },
+      options: { checktime, responseMapping },
       variables,
     }) => {
       const { baseUrl } = credentials
@@ -43,7 +43,6 @@ export const checkTime = createAction({
         if (response.status < 300 && response.status >= 200) {
           const res = await response.json()
           result = res.Checktime
-          console.log('DELETEME: Got Checktime result ', res)
         }
       }
 
