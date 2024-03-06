@@ -56,10 +56,6 @@ export const cortex = createAction({
         ? options.retries
         : defaultCortexOptions.retries
 
-      console.log(
-        'DELETEME: Cortex server run 00000000000000000000000000000000000000000000000000000000 !'
-      )
-
       const id_chatbot = variables
         .list()
         .find((v) => v.name === 'id_chatbot')?.value
@@ -67,10 +63,6 @@ export const cortex = createAction({
       const id_cliente = variables
         .list()
         .find((v) => v.name === 'id_cliente')?.value
-
-      const accountcode = variables
-        .list()
-        .find((v) => v.name === 'accountcode')?.value
 
       let result = false
 
@@ -107,33 +99,28 @@ export const cortex = createAction({
           baseUrl = baseUrl.slice(0, -1)
         }
         const url = `${baseUrl}/ivci/webhook/cortex?${params.toString()}`
-        console.log('DELETEME: Cortex URL ', url)
 
         const response = await fetch(url, { method: 'POST' })
         if (response.status < 300 && response.status >= 200) {
-          const res = await response.json()
-          result = res.Checktime
-          console.log('DELETEME: Got cortex result ', res)
-          // responseMapping?.forEach((r) => {
-          //   if (!r.variableId) return
-          //   if (!r.item || r.item === 'Resultado') {
-          //     variables.set(r.variableId, result)
-          //   }
-          // })
+          // const res = await response.json()
+          result = true
         } else {
-          console.log('DELETEME: Got cortex response ', response.status)
-          console.log('DELETEME: Got cortex response ', response.statusText)
+          console.error(
+            'Error in cortex response ',
+            response.status,
+            response.statusText
+          )
           try {
             const res = await response.json()
-            console.log('DELETEME: Got cortex response ', res.detail)
+            console.error('Detailed errors: ', res.detail)
           } catch (e) {}
         }
       } else {
-        console.log('DELETEME: Missing stuffs')
-        console.log(
-          `knowledgeBase: ${knowledgeBase} baseUrl: ${baseUrl} cortexToken: ${cortexToken}  id_chatbot: ${id_chatbot} id_cliente: ${id_cliente} initialMessage: ${initialMessage} endCmd: ${endCmd} agentCmd: ${agentCmd} retries: ${retries}`
+        console.error(
+          `Missing Parameters: knowledgeBase: ${knowledgeBase} baseUrl: ${baseUrl} cortexToken: ${cortexToken}  id_chatbot: ${id_chatbot} id_cliente: ${id_cliente} initialMessage: ${initialMessage} endCmd: ${endCmd} agentCmd: ${agentCmd} retries: ${retries}`
         )
       }
+      console.log('DELETEME: Ending server issuess ')
     },
     web: {
       displayEmbedBubble: {
@@ -145,7 +132,7 @@ export const cortex = createAction({
               content: `
               window.addEventListener('message', function (event) {
                 if (event && 'kwikEvent' in event.data && event.data.kwikEvent === 'close-chat'){
-                  continueFlow('Chat encerrado pelo operador');
+                  continueFlow(event.data.lastMsg);
                 }
             })
               `,
@@ -154,18 +141,36 @@ export const cortex = createAction({
         },
         parseInitFunction: ({ options, variables, credentials }) => {
           const { baseUrl } = credentials
-          console.log(
-            'DELETEME: ParseInitiFunction queueJoin',
-            options,
-            variables,
-            credentials
-          )
+
+          const initialMessage = options.initialMessage
+            ? options.initialMessage
+            : defaultCortexOptions.initialMessage
+          const endCmd = options.endCmd
+            ? options.endCmd
+            : defaultCortexOptions.endCmd
+          const agentCmd = options.agentCmd
+            ? options.agentCmd
+            : defaultCortexOptions.agentCmd
 
           const hash = variables
             .list()
             .find((v) => v.name === 'id_atendimento')?.value
-          const url = `${baseUrl}/builder_chat/${hash}/`
-          console.log('DELETEME: Load URL ', url)
+
+          const id_chatbot =
+            variables.list().find((v) => v.name === 'id_chatbot')?.value || ''
+
+          const id_cliente =
+            variables.list().find((v) => v.name === 'id_cliente')?.value || ''
+
+          const params = new URLSearchParams({
+            initial_message: initialMessage.toString(),
+            cmd_fim: endCmd.toString(),
+            cmd_atendimento: agentCmd.toString(),
+            id_chatbot: id_chatbot.toString(),
+            id_cliente: id_cliente.toString(),
+          })
+
+          const url = `${baseUrl}/builder_chat/${hash}?${params.toString()}`
           return {
             args: {},
             content: `

@@ -34,13 +34,9 @@ export const queueJoin = createAction({
         .list()
         .find((v) => v.name === 'id_cliente')?.value
       const url = `${baseUrl}/ivci/webhook/queue_join?queue=${queue}&page_id=${id_chatbot}&sender_id=${id_cliente}`
-      console.log('DELETEME: QueueJoin URL ', url)
       const response = await fetch(url, { method: 'POST' })
-      console.log('DELETEME: Reponse queuejoin ', response.status)
       if (response.status < 300 && response.status >= 200) {
         const res = await response.json()
-        console.log('DELETEME: Got queueJoin result ', res)
-        // variables.set(responseMapping, res)
       }
     },
     web: {
@@ -62,18 +58,10 @@ export const queueJoin = createAction({
         },
         parseInitFunction: ({ options, variables, credentials }) => {
           const { baseUrl } = credentials
-          console.log(
-            'DELETEME: ParseInitiFunction queueJoin',
-            options,
-            variables,
-            credentials
-          )
-
           const hash = variables
             .list()
             .find((v) => v.name === 'id_atendimento')?.value
           const url = `${baseUrl}/builder_chat/${hash}/`
-          console.log('DELETEME: Load URL ', url)
           return {
             args: {},
             content: `
