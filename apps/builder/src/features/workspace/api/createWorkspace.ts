@@ -69,7 +69,6 @@ export const createWorkspace = authenticatedProcedure
      */
     const exist = await listCredentials({
       workspaceId: newWorkspace.id,
-      userId: user.id,
       type: 'instantchat',
     })
 
