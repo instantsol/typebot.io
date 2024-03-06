@@ -9,6 +9,21 @@ export const baseOptions = option.object({
     withVariableButton: false,
     isRequired: true,
   }),
+  wsKey: option.string.layout({
+    accordion: 'Customize provider',
+    label: 'Webservice key',
+    defaultValue: '',
+    withVariableButton: false,
+    isRequired: true,
+  }),
+  accountcode: option.string.layout({
+    accordion: 'Customize provider',
+    label: 'Accountcode',
+    defaultValue: '',
+    withVariableButton: false,
+    isRequired: true,
+  }),
+
   cortexUrl: option.string.layout({
     accordion: 'Cortex',
     label: 'Cortex URL',
