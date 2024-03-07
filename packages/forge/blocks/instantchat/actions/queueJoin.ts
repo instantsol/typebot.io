@@ -85,7 +85,7 @@ export const queueJoin = createAction({
       id: 'fetchQueues',
       dependencies: ['baseUrl', 'accountcode', 'wsKey'],
       fetch: async ({ credentials, options }) => {
-        let { baseUrl, accountcode, wsKey } = credentials
+        const { baseUrl, accountcode, wsKey } = credentials
         if (baseUrl && accountcode && wsKey) {
           const body = {
             QueueList: {
