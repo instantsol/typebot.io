@@ -11,6 +11,7 @@ export const checkTime = createAction({
       label: 'Check time',
       moreInfoTooltip:
         'Informe o nome do ckecktime ou escolha a variável que contém essa informação.',
+      fetcher: 'fetchChecktimes',
     }),
     responseMapping: option.saveResponseArray(['Resultado']).layout({
       accordion: 'Salvar resultado',
@@ -54,4 +55,23 @@ export const checkTime = createAction({
       })
     },
   },
+  fetchers: [
+    {
+      id: 'fetchChecktimes',
+      dependencies: ['baseUrl', 'accountcode'],
+      fetch: async ({ credentials, options }) => {
+        const { baseUrl, accountcode } = credentials
+
+        if (baseUrl && accountcode) {
+          const url = `${baseUrl}/ivci/webhook/checktime/${accountcode}`
+          const response = await fetch(url, { method: 'GET' })
+          if (response.status < 300 && response.status >= 200) {
+            const res = await response.json()
+            return res
+          }
+        }
+        return []
+      },
+    },
+  ],
 })
