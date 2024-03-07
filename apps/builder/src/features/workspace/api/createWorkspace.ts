@@ -5,8 +5,6 @@ import { Workspace, workspaceSchema } from '@typebot.io/schemas'
 import { z } from 'zod'
 import { parseWorkspaceDefaultPlan } from '../helpers/parseWorkspaceDefaultPlan'
 import { trackEvents } from '@typebot.io/lib/telemetry/trackEvents'
-import { listCredentials } from '@/features/forge/api/credentials/listCredentials'
-import { createCredentials } from '@/features/forge/api/credentials/createCredentials'
 
 export const createWorkspace = authenticatedProcedure
   .meta({
@@ -63,29 +61,6 @@ export const createWorkspace = authenticatedProcedure
         plan,
       },
     })) as Workspace
-
-    /*
-    create default Instant provider
-     */
-    const exist = await listCredentials({
-      workspaceId: newWorkspace.id,
-      type: 'instantchat',
-    })
-
-    if (!exist.credentials || exist.credentials.length === 0) {
-      const host = user.email.split('@')[0]
-      await createCredentials({
-        credentials: {
-          data: {
-            baseUrl: 'https://' + host,
-            name: 'Instant AIO',
-            type: 'instantchat',
-            workspaceId: newWorkspace.id,
-          },
-        },
-        user,
-      })
-    }
 
     await trackEvents([
       {
