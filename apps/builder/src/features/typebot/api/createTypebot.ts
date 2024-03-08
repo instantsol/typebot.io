@@ -94,14 +94,41 @@ export const createTypebot = authenticatedProcedure
     }
 
     if (user.email !== null && workspaceId !== null) {
-      createInstantProviderCredentials({
-        data: {
-          baseUrl: 'https://' + user.email.split('@')[0],
-        },
-        type: 'instantchat',
-        workspaceId: workspaceId,
-        name: 'Instant Chat',
-      })
+      const [host, acc] = user.email.split('@')
+      const accountcode = acc.split('.')[0]
+      const baseUrl = 'https://' + host
+      const url = `${baseUrl}/ivci/webhook/accountcode_info/${accountcode}`
+      const response = await fetch(url, { method: 'GET' })
+      if (response.status < 300 && response.status >= 200) {
+        const { wsKey, cortexAccountID, cortexUrl, cortexToken } =
+          await response.json()
+        const data = {
+          baseUrl,
+          accountcode,
+          wsKey,
+          cortexUrl,
+          cortexAccountID,
+          cortexToken,
+        }
+        console.log('Creating credentials with cortex data. ', data)
+        createInstantProviderCredentials({
+          data,
+          type: 'instantchat',
+          workspaceId: workspaceId,
+          name: 'Instant All-In-One',
+        })
+      } else {
+        console.log('Creating credentials without cortex data. ', baseUrl)
+        createInstantProviderCredentials({
+          data: {
+            baseUrl,
+            accountcode,
+          },
+          type: 'instantchat',
+          workspaceId: workspaceId,
+          name: 'Instant All-In-One',
+        })
+      }
     }
 
     const newTypebot = await prisma.typebot.create({

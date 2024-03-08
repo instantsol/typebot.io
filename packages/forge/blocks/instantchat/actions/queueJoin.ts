@@ -1,11 +1,14 @@
 import { createAction, option } from '@typebot.io/forge'
 import { isDefined } from '@typebot.io/lib'
+import { baseOptions } from '../baseOptions'
 
 export const queueJoin = createAction({
   name: 'Queue join',
+  baseOptions,
   options: option.object({
     queue: option.string.layout({
       label: 'Queue ID',
+      fetcher: 'fetchQueues',
       moreInfoTooltip:
         'Informe o código da fila ou escolha a variável que contém essa informação.',
     }),
@@ -77,4 +80,36 @@ export const queueJoin = createAction({
       },
     },
   },
+  fetchers: [
+    {
+      id: 'fetchQueues',
+      dependencies: ['baseUrl', 'accountcode', 'wsKey'],
+      fetch: async ({ credentials, options }) => {
+        const { baseUrl, accountcode, wsKey } = credentials
+        if (baseUrl && accountcode && wsKey) {
+          const body = {
+            QueueList: {
+              key: wsKey,
+              accountcode: accountcode,
+              media: 'c',
+            },
+          }
+          const response = await fetch(`${baseUrl}/ivws/instantrest`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+          })
+          if (response.status < 300 && response.status >= 200) {
+            const res = await response.json()
+            if (res.QueueListResult0 == 0) {
+              return res.QueueListResult2
+            }
+          }
+        }
+        return []
+      },
+    },
+  ],
 })
