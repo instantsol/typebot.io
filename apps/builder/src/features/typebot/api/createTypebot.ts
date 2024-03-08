@@ -14,6 +14,7 @@ import {
 import { createId } from '@paralleldrive/cuid2'
 import { EventType } from '@typebot.io/schemas/features/events/constants'
 import { trackEvents } from '@typebot.io/lib/telemetry/trackEvents'
+import { createInstantProviderCredentials } from '@/features/typebot/api/autocreateprovider'
 
 const typebotCreateSchemaPick = {
   name: true,
@@ -92,11 +93,22 @@ export const createTypebot = authenticatedProcedure
       if (!existingFolder) typebot.folderId = null
     }
 
+    if (user.email !== null && workspaceId !== null) {
+      createInstantProviderCredentials({
+        data: {
+          baseUrl: 'https://' + user.email.split('@')[0],
+        },
+        type: 'instantchat',
+        workspaceId: workspaceId,
+        name: 'Instant Chat',
+      })
+    }
+
     const newTypebot = await prisma.typebot.create({
       data: {
         version: '6',
         workspaceId,
-        name: typebot.name ?? 'My typebot',
+        name: typebot.name ?? 'My bot',
         icon: typebot.icon,
         selectedThemeTemplateId: typebot.selectedThemeTemplateId,
         groups: (typebot.groups
