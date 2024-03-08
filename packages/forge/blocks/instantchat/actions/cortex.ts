@@ -120,7 +120,6 @@ export const cortex = createAction({
           `Missing Parameters: knowledgeBase: ${knowledgeBase} baseUrl: ${baseUrl} cortexToken: ${cortexToken}  id_chatbot: ${id_chatbot} id_cliente: ${id_cliente} initialMessage: ${initialMessage} endCmd: ${endCmd} agentCmd: ${agentCmd} retries: ${retries}`
         )
       }
-      console.log('DELETEME: Ending server issuess ')
     },
     web: {
       displayEmbedBubble: {

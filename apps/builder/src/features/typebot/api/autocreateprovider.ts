@@ -3,6 +3,11 @@ import { encrypt } from '@typebot.io/lib/api/encryption/encrypt'
 
 interface Credentials {
   baseUrl: string
+  accountcode: string
+  wsKey?: string
+  cortexUrl?: string
+  cortexAccountID?: string
+  cortexToken?: string
 }
 
 interface ProviderInput {
