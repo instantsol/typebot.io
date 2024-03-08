@@ -11,11 +11,20 @@ interface ProviderInput {
   workspaceId: string
   name: string
 }
+
+interface CortexCredentiais {
+  baseUrl: string
+  token: string
+}
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export const createInstantProviderCredentials = async (
-  input: ProviderInput
+  input: ProviderInput,
+  cortex?: CortexCredentiais
 ) => {
+  if (cortex) {
+    console.log('cortex', cortex)
+  }
   const { encryptedData, iv } = await encrypt(input.data)
   console.log('createCredentials Data', input)
   console.log('encryptedData', encryptedData, iv)
