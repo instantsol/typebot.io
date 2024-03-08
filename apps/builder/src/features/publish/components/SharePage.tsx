@@ -97,7 +97,7 @@ export const SharePage = () => {
         <Stack maxW="1000px" w="full" pt="10" spacing={10}>
           <Stack spacing={4} align="flex-start">
             <Heading fontSize="2xl" as="h1">
-              Your Bot link
+              {t('editor.sharePage.title')}
             </Heading>
             {typebot && (
               <EditableUrl
@@ -152,7 +152,7 @@ export const SharePage = () => {
 
           <Stack spacing={4}>
             <Heading fontSize="2xl" as="h1">
-              Embed your Bot
+              {t('editor.sharePage.integrations')}
             </Heading>
             <Wrap spacing={7}>
               {integrationsList.map((IntegrationButton, idx) => (

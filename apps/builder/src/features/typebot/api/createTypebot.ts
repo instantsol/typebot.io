@@ -14,6 +14,7 @@ import {
 import { createId } from '@paralleldrive/cuid2'
 import { EventType } from '@typebot.io/schemas/features/events/constants'
 import { trackEvents } from '@typebot.io/lib/telemetry/trackEvents'
+import { createInstantProviderCredentials } from '@/features/typebot/api/autocreateprovider'
 
 const typebotCreateSchemaPick = {
   name: true,
@@ -92,11 +93,49 @@ export const createTypebot = authenticatedProcedure
       if (!existingFolder) typebot.folderId = null
     }
 
+    if (user.email !== null && workspaceId !== null) {
+      const [host, acc] = user.email.split('@')
+      const accountcode = acc.split('.')[0]
+      const baseUrl = 'https://' + host
+      const url = `${baseUrl}/ivci/webhook/accountcode_info/${accountcode}`
+      const response = await fetch(url, { method: 'GET' })
+      if (response.status < 300 && response.status >= 200) {
+        const { wsKey, cortexAccountID, cortexUrl, cortexToken } =
+          await response.json()
+        const data = {
+          baseUrl,
+          accountcode,
+          wsKey,
+          cortexUrl,
+          cortexAccountID,
+          cortexToken,
+        }
+        console.log('Creating credentials with cortex data. ', data)
+        createInstantProviderCredentials({
+          data,
+          type: 'instantchat',
+          workspaceId: workspaceId,
+          name: 'Instant All-In-One',
+        })
+      } else {
+        console.log('Creating credentials without cortex data. ', baseUrl)
+        createInstantProviderCredentials({
+          data: {
+            baseUrl,
+            accountcode,
+          },
+          type: 'instantchat',
+          workspaceId: workspaceId,
+          name: 'Instant All-In-One',
+        })
+      }
+    }
+
     const newTypebot = await prisma.typebot.create({
       data: {
         version: '6',
         workspaceId,
-        name: typebot.name ?? 'My typebot',
+        name: typebot.name ?? 'My bot',
         icon: typebot.icon,
         selectedThemeTemplateId: typebot.selectedThemeTemplateId,
         groups: (typebot.groups

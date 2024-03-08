@@ -1,8 +1,8 @@
 import { option, AuthDefinition } from '@typebot.io/forge'
-import { baseAuthOptions } from './baseOptions'
+import { baseOptions } from './baseOptions'
 
 export const auth = {
   type: 'encryptedCredentials',
   name: 'InstantAIO account',
-  schema: baseAuthOptions,
+  schema: baseOptions,
 } satisfies AuthDefinition

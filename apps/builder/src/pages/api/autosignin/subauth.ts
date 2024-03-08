@@ -109,12 +109,13 @@ async function NextAuthApiAutomaticHandler(
     })
   }
 
-  return res.json({
+  const retval = res.json({
     url: _url,
     botlist: botsList,
     user: user,
     apikey: apikey?.token,
   })
+  return retval
 }
 
 export default NextAuthApiAutomaticHandler
