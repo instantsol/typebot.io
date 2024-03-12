@@ -14,6 +14,12 @@ export const queueJoin = createAction({
     }),
     // responseMapping: option.saveResponseArray(['Message'] as const).layout({
     //   accordion: 'Save response',
+    queueVar: option.string.layout({
+      accordion: 'Avançado',
+      label: 'Queue Var',
+      isRequired: false,
+      withVariableButton: true,
+    }),
     // }),
     responseMapping: option.string.layout({
       label: 'Save response',
@@ -25,7 +31,7 @@ export const queueJoin = createAction({
   // responseMapping?.map((r) => r.variableId).filter(isDefined) ?? [],
   run: {
     server: async ({
-      options: { queue, responseMapping },
+      options: { queue, queueVar, responseMapping },
       variables,
       credentials,
     }) => {
@@ -36,7 +42,9 @@ export const queueJoin = createAction({
       const id_cliente = variables
         .list()
         .find((v) => v.name === 'id_cliente')?.value
-      const url = `${baseUrl}/ivci/webhook/queue_join?queue=${queue}&page_id=${id_chatbot}&sender_id=${id_cliente}`
+      const queueId = queueVar ? queueVar : queue
+      console.log('Going to call queue ', queueId)
+      const url = `${baseUrl}/ivci/webhook/queue_join?queue=${queueId}&page_id=${id_chatbot}&sender_id=${id_cliente}`
       const response = await fetch(url, { method: 'POST' })
       if (response.status < 300 && response.status >= 200) {
         const res = await response.json()
