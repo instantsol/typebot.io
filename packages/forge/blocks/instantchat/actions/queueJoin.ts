@@ -2,6 +2,11 @@ import { createAction, option } from '@typebot.io/forge'
 import { isDefined } from '@typebot.io/lib'
 import { baseOptions } from '../baseOptions'
 
+const parseQueueName = (queue: string) => {
+  const queueName = queue.split('_')[1]
+  return queueName
+}
+
 export const queueJoin = createAction({
   name: 'Queue join',
   baseOptions,
@@ -94,14 +99,16 @@ export const queueJoin = createAction({
       dependencies: ['baseUrl', 'accountcode', 'wsKey'],
       fetch: async ({ credentials, options }) => {
         const { baseUrl, accountcode, wsKey } = credentials
+
         if (baseUrl && accountcode && wsKey) {
           const body = {
-            QueueList: {
+            AccountcodesQueuesInfo: {
               key: wsKey,
-              accountcode: accountcode,
+              accountcodes: [accountcode],
               media: 'c',
             },
           }
+
           const response = await fetch(`${baseUrl}/ivws/instantrest`, {
             method: 'POST',
             headers: {
@@ -111,8 +118,11 @@ export const queueJoin = createAction({
           })
           if (response.status < 300 && response.status >= 200) {
             const res = await response.json()
-            if (res.QueueListResult0 == 0) {
-              return res.QueueListResult2
+            if (res.AccountcodesQueuesInfoResult0 == 0) {
+              return res.AccountcodesQueuesInfoResult2.map((q: any) => ({
+                label: `${parseQueueName(q.name)}: ${q.description}`,
+                value: parseQueueName(q.name),
+              }))
             }
           }
         }
