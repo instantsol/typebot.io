@@ -4,6 +4,7 @@ import { InputBlockType } from '@typebot.io/schemas/features/blocks/inputs/const
 import { IntegrationBlockType } from '@typebot.io/schemas/features/blocks/integrations/constants'
 import { LogicBlockType } from '@typebot.io/schemas/features/blocks/logic/constants'
 
+
 export const getHelpDocUrl = (
   blockType: BlockWithOptions['type'],
   blockDef?: ForgedBlockDefinition
