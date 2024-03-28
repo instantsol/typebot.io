@@ -4,7 +4,6 @@ import { BlockWithOptions } from '@typebot.io/schemas'
 //import { IntegrationBlockType } from '@typebot.io/schemas/features/blocks/integrations/constants'
 //import { LogicBlockType } from '@typebot.io/schemas/features/blocks/logic/constants'
 
-
 export const getHelpUrls = (
   blockType: BlockWithOptions['type']
 ): string | undefined => {
@@ -13,4 +12,3 @@ export const getHelpUrls = (
       return 'https://instant.getoutline.com/s/instantbuilder'
   }
 }
-
