@@ -6,6 +6,11 @@ export const agent = createAction({
   name: 'Operador',
   baseOptions,
   options: option.object({
+    uniqueId: option.string.layout({
+      label: 'Unique ID',
+      moreInfoTooltip:
+        'Informe o protocolo do atendimento do qual deseja informações do operador.',
+    }),
     responseMapping: option.saveResponseArray(['Nome', 'Fila', 'Email']).layout({
       accordion: 'Salvar dados',
     }),
@@ -14,7 +19,7 @@ export const agent = createAction({
     responseMapping ? [responseMapping] : [],
   run: {
     server: async ({
-      options: { responseMapping },
+      options: { uniqueId, responseMapping },
       variables,
       credentials,
     }) => {
@@ -25,7 +30,7 @@ export const agent = createAction({
       const id_cliente = variables
         .list()
         .find((v) => v.name === 'id_cliente')?.value
-      const url = `${baseUrl}/ivci/webhook/get_agent?page_id=${id_chatbot}&sender_id=${id_cliente}`
+      const url = `${baseUrl}/ivci/webhook/get_agent?unique_id=${uniqueId}&page_id=${id_chatbot}&sender_id=${id_cliente}`
       const response = await fetch(url, { method: 'POST' })
       if (response.status < 300 && response.status >= 200) {
         const res = await response.json()
