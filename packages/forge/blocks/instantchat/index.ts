@@ -4,6 +4,7 @@ import { auth } from './auth'
 import { queueJoin } from './actions/queueJoin'
 import { checkTime } from './actions/checkTime'
 import { cortex } from './actions/cortex'
+import { agent } from './actions/agent'
 
 export const instantchat = createBlock({
   id: 'instantchat' as const,
@@ -11,5 +12,5 @@ export const instantchat = createBlock({
   tags: [],
   LightLogo: InstantchatLogo,
   auth,
-  actions: [queueJoin, checkTime, cortex],
+  actions: [queueJoin, checkTime, cortex, agent],
 })
