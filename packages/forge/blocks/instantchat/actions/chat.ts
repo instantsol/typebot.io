@@ -11,7 +11,7 @@ export const chat = createAction({
       moreInfoTooltip:
         'Informe o protocolo do atendimento do qual deseja informações.',
     }),
-    responseMapping: option.saveResponseArray(['Identificador do Cliente', 'Data e Hora', 'Adicional Chave1', 'Adicional Valor1', 'Adicionar Chave2', 'Adicional Valor2', 'Unique ID', 'Plataforma']).layout({
+    responseMapping: option.saveResponseArray(['Identificador do Cliente', 'Data e Hora', 'Unique ID', 'Plataforma', 'Dado Adicional 1 (chave)', 'Dado Adicional 1 (valor)', 'Dado Adicional 2 (chave)', 'Dado Adicional 2 (valor)']).layout({
       accordion: 'Salvar dados',
     }),
   }),
@@ -39,13 +39,13 @@ export const chat = createAction({
             variables.set(r.variableId, res.Chat?.nick)
           else if (r.item === 'Data e Hora')
             variables.set(r.variableId, res.Chat?.time)
-          else if (r.item === 'Adicional Chave1')
+          else if (r.item === 'Dado Adicional 1 (chave)')
             variables.set(r.variableId, res.Chat?.custom_field2_title)
-          else if (r.item === 'Adicional Valor1')
+          else if (r.item === 'Dado Adicional 1 (valor)')
             variables.set(r.variableId, res.Chat?.custom_field2_value)
-          else if (r.item === 'Adicional Chave2')
+          else if (r.item === 'Dado Adicional 2 (chave)')
             variables.set(r.variableId, res.Chat?.custom_field3_title)
-          else if (r.item === 'Adicional Valor2')
+          else if (r.item === 'Dado Adicional 2 (valor)')
             variables.set(r.variableId, res.Chat?.custom_field3_value)
           else if (r.item === 'Unique ID')
             variables.set(r.variableId, res.Chat?.uniqueid)
