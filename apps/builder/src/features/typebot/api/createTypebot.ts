@@ -15,6 +15,7 @@ import { createId } from '@paralleldrive/cuid2'
 import { EventType } from '@typebot.io/schemas/features/events/constants'
 import { trackEvents } from '@typebot.io/lib/telemetry/trackEvents'
 import { createInstantProviderCredentials } from '@/features/typebot/api/autocreateprovider'
+import { createInstantVariables } from '@/features/typebot/api/autocreatevariables'
 
 const typebotCreateSchemaPick = {
   name: true,
@@ -92,7 +93,8 @@ export const createTypebot = authenticatedProcedure
       })
       if (!existingFolder) typebot.folderId = null
     }
-
+    //let is_variables: Array<string> = null;
+    let is_variables: { id: string, name: string }[] = [];
     if (user.email !== null && workspaceId !== null) {
       const [host, acc] = user.email.split('@')
       const accountcode = acc.split('.')[0]
@@ -117,6 +119,11 @@ export const createTypebot = authenticatedProcedure
           workspaceId: workspaceId,
           name: 'Instant All-In-One',
         })
+        is_variables = await createInstantVariables(data)
+        if (is_variables){
+          console.log('Variables created create typebot', is_variables)
+        }
+        
       } else {
         console.log('Creating credentials without cortex data. ', baseUrl)
         createInstantProviderCredentials({
@@ -157,7 +164,7 @@ export const createTypebot = authenticatedProcedure
             }
           : {},
         folderId: typebot.folderId,
-        variables: typebot.variables ?? [],
+        variables: is_variables ?? [],
         edges: typebot.edges ?? [],
         resultsTablePreferences: typebot.resultsTablePreferences ?? undefined,
         publicId: typebot.publicId ?? undefined,
