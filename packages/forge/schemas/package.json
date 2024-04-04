@@ -17,6 +17,7 @@
     "@typebot.io/dify-ai-block": "workspace:*",
     "@typebot.io/mistral-block": "workspace:*",
     "@typebot.io/elevenlabs-block": "workspace:*",
-    "@typebot.io/instantchat-block": "workspace:*"
+    "@typebot.io/instantchat-block": "workspace:*",
+    "@typebot.io/pause-block": "workspace:*"
   }
 }
