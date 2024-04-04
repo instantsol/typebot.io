@@ -11,12 +11,14 @@ export const chat = createAction({
       moreInfoTooltip:
         'Informe o protocolo do atendimento do qual deseja informações.',
     }),
-    responseMapping: option.saveResponseArray(['Identificador do Cliente', 'Data e Hora', 'Unique ID', 'Plataforma', 'Dado Adicional 1 (chave)', 'Dado Adicional 1 (valor)', 'Dado Adicional 2 (chave)', 'Dado Adicional 2 (valor)']).layout({
-      accordion: 'Salvar dados',
-    }),
+    responseMapping: option
+      .saveResponseArray(['Identificador do Cliente', 'Data e Hora', 'Unique ID', 'Plataforma', 'Dado Adicional 1 (chave)', 'Dado Adicional 1 (valor)', 'Dado Adicional 2 (chave)', 'Dado Adicional 2 (valor)', 'Mensagens', 'Nome do Agente', 'Fila do Agente', 'Email do Agente'] as const)
+      .layout({
+        accordion: 'Salvar dados',
+      }),
   }),
   getSetVariableIds: ({ responseMapping }) =>
-    responseMapping ? [responseMapping] : [],
+    responseMapping?.map((r) => r.variableId).filter(isDefined) ?? [],
   run: {
     server: async ({
       options: { uniqueId, responseMapping },
@@ -34,23 +36,33 @@ export const chat = createAction({
       const response = await fetch(url, { method: 'POST' })
       if (response.status < 300 && response.status >= 200) {
         const res = await response.json()
-        responseMapping.forEach((r) => {
-          if (!r.item || r.item === 'Identificador do Cliente')
+        responseMapping?.forEach((r) => {
+          if (!r.variableId) return
+          const item = r.item ?? 'Identificador do Cliente'
+          if (item === 'Identificador do Cliente')
             variables.set(r.variableId, res.Chat?.nick)
-          else if (r.item === 'Data e Hora')
+          if (item === 'Data e Hora')
             variables.set(r.variableId, res.Chat?.time)
-          else if (r.item === 'Dado Adicional 1 (chave)')
+          if (item === 'Dado Adicional 1 (chave)')
             variables.set(r.variableId, res.Chat?.custom_field2_title)
-          else if (r.item === 'Dado Adicional 1 (valor)')
+          if (item === 'Dado Adicional 1 (valor)')
             variables.set(r.variableId, res.Chat?.custom_field2_value)
-          else if (r.item === 'Dado Adicional 2 (chave)')
+          if (item === 'Dado Adicional 2 (chave)')
             variables.set(r.variableId, res.Chat?.custom_field3_title)
-          else if (r.item === 'Dado Adicional 2 (valor)')
+          if (item === 'Dado Adicional 2 (valor)')
             variables.set(r.variableId, res.Chat?.custom_field3_value)
-          else if (r.item === 'Unique ID')
+          if (item === 'Unique ID')
             variables.set(r.variableId, res.Chat?.uniqueid)
-          else if (r.item === 'Plataforma')
+          if (item === 'Plataforma')
             variables.set(r.variableId, res.Chat?.platform)
+          if (item === 'Mensagens')
+            variables.set(r.variableId, res.Chat?.messages)
+          if (item === 'Nome do Agente')
+            variables.set(r.variableId, res.Chat?.agent_name)
+          if (item === 'Fila do Agente')
+            variables.set(r.variableId, res.Chat?.agent_queue)
+          if (item === 'Email do Agente')
+            variables.set(r.variableId, res.Chat?.agent_email)
         })
       }
     }
