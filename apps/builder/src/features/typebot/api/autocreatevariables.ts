@@ -9,23 +9,17 @@ interface Credentials {
   cortexToken?: string
 }
 
+export const createInstantVariables = async (input: Credentials) => {
+  const body = {
+    GetVariablesList: {
+      key: input.wsKey,
+      accountcodes: [input.accountcode],
+      media: 'c',
+    },
+  }
 
-export const createInstantVariables = async (
-  input: Credentials  
-) => {
-    const body = {
-      GetVariablesList: {
-        key: input.wsKey,
-        accountcodes: [input.accountcode],
-        media: 'c',
-      },
-    }
-  
-  
-  
-  let datatoinsert: { id: string, name: string }[] = []; // eslint-disable-line
-  
-  
+  let datatoinsert: { id: string; name: string }[] = [] // eslint-disable-line
+
   try {
     const response = await fetch(`${input.baseUrl}/ivws/instantrest`, {
       method: 'POST',
@@ -37,7 +31,7 @@ export const createInstantVariables = async (
 
     if (response.status < 300 && response.status >= 200) {
       const res = await response.json()
-      for (const value of res){
+      for (const value of res) {
         let id = 'v' + createId() // eslint-disable-line
         datatoinsert.push({ id, name: value })
       }
