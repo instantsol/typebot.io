@@ -1,9 +1,11 @@
+import { FetcherDefinition, AuthDefinition } from '@typebot.io/forge'
+
 const parseQueueName = (queue: string) => {
   const queueName = queue.split('_')[1]
   return queueName
 }
 
-export const fetchQueues = {
+export const fetchQueues: FetcherDefinition<AuthDefinition, any> = {
   id: 'fetchQueues',
   dependencies: ['baseUrl', 'accountcode', 'wsKey'],
   fetch: async ({ credentials, options }) => {
