@@ -21,7 +21,7 @@ interface CortexCredentiais {
   baseUrl: string
   token: string
 }
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export const createInstantProviderCredentials = async (
   input: ProviderInput,

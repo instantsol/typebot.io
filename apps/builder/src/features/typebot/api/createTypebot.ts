@@ -94,7 +94,7 @@ export const createTypebot = authenticatedProcedure
       if (!existingFolder) typebot.folderId = null
     }
     //let is_variables: Array<string> = null;
-    let is_variables: { id: string, name: string }[] = [];
+    let is_variables: { id: string; name: string }[] = []
     if (user.email !== null && workspaceId !== null) {
       const [host, acc] = user.email.split('@')
       const accountcode = acc.split('.')[0]
@@ -120,10 +120,9 @@ export const createTypebot = authenticatedProcedure
           name: 'Instant All-In-One',
         })
         is_variables = await createInstantVariables(data)
-        if (is_variables){
+        if (is_variables) {
           console.log('Variables created create typebot', is_variables)
         }
-        
       } else {
         console.log('Creating credentials without cortex data. ', baseUrl)
         createInstantProviderCredentials({
