@@ -45,6 +45,19 @@ import { SettingsModal } from './SettingsModal'
 import { TElement } from '@udecode/plate-common'
 import { LogicBlockType } from '@typebot.io/schemas/features/blocks/logic/constants'
 import { useGroupsStore } from '@/features/graph/hooks/useGroupsStore'
+import { forgedBlocks } from '@typebot.io/forge-schemas'
+
+const isInstantAIOAction = (action: string) => {
+  const actions = forgedBlocks.filter((block) => {
+    return block.name === 'InstantAIO'
+  })[0].actions
+
+  let exists = false
+  actions.forEach((obj) => {
+    if (obj.name === action) exists = true
+  })
+  return exists
+}
 
 export const BlockNode = ({
   block,
@@ -189,6 +202,16 @@ export const BlockNode = ({
   const hasIcomingEdge = typebot?.edges.some((edge) => {
     return edge.to.blockId === block.id
   })
+
+  if (isInstantAIOAction(block.type)) {
+    // Hacking the immutable object to force a specific instantchat action
+    const newBlock = {
+      id: block.id,
+      type: 'instantchat',
+      options: { action: block.type },
+    } as BlockV6
+    block = newBlock
+  }
 
   return isEditing && isTextBubbleBlock(block) ? (
     <TextBubbleEditor
