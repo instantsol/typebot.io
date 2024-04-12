@@ -23,11 +23,11 @@ interface ProviderInput {
 const compareTokens = function (cc: Credentials, nc: Credentials) {
   // We don't want to update if the token changed, only if it didn't exist and now we have one.
 
-  if (nc.cortexToken != null && cc.cortexToken == null) {
+  if (nc.cortexToken && !cc.cortexToken) {
     return true
   }
 
-  if (nc.kwikToken != null && cc.kwikToken == null) {
+  if (nc.kwikToken && !cc.kwikToken) {
     return true
   }
   return false
