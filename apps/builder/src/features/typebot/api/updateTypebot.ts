@@ -18,6 +18,7 @@ import { isCloudProdInstance } from '@/helpers/isCloudProdInstance'
 import { Prisma } from '@typebot.io/prisma'
 import { hasProPerks } from '@/features/billing/helpers/hasProPerks'
 import { migrateTypebot } from '@typebot.io/lib/migrations/migrateTypebot'
+import { createInstantProviderCredentials } from '@/features/typebot/api/autocreateprovider'
 
 const typebotUpdateSchemaPick = {
   version: true,
@@ -167,6 +168,11 @@ export const updateTypebot = authenticatedProcedure
       })
     }
 
+    if (user.email)
+      await createInstantProviderCredentials(
+        user.email,
+        existingTypebot.workspace.id
+      )
     const newTypebot = await prisma.typebot.update({
       where: {
         id: existingTypebot.id,
