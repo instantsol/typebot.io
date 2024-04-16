@@ -6,6 +6,7 @@ import { createInstantVariables } from '@/features/typebot/api/autocreatevariabl
 interface Credentials {
   baseUrl: string
   accountcode: string
+  enterpriseId: string
   wsKey?: string
   cortexUrl?: string
   cortexAccountID?: string
@@ -39,7 +40,8 @@ const credentialsAreDifferent = function (cc: Credentials, nc: Credentials) {
     cc.accountcode != nc.accountcode ||
     cc.wsKey != nc.wsKey ||
     cc.cortexUrl != nc.cortexUrl ||
-    cc.cortexAccountID != nc.cortexAccountID
+    cc.cortexAccountID != nc.cortexAccountID ||
+    cc.enterpriseId != nc.enterpriseId
   )
 }
 
@@ -70,6 +72,7 @@ const createCredential = async (input: ProviderInput) => {
       )) as Credentials
 
       if (compareCredentials(data, input.data)) {
+        console.log('Got credentials change, update it.', input.data)
         const updatedCredentials = await prisma.credentials.update({
           where: {
             id: listInstantCredentials.id,
@@ -119,17 +122,13 @@ export const createInstantProviderCredentials = async (
     const url = `${baseUrl}/ivci/webhook/accountcode_info/${accountcode}`
     const response = await fetch(url, { method: 'GET' })
     if (response.status < 300 && response.status >= 200) {
-      const { wsKey, cortexAccountID, cortexUrl, cortexToken, kwikToken } =
-        await response.json()
+      const info = await response.json()
       const data = {
+        ...info,
         baseUrl,
         accountcode,
-        wsKey,
-        cortexUrl,
-        cortexAccountID,
-        cortexToken,
-        kwikToken,
       }
+
       createCredential({
         data,
         type: 'instantchat',

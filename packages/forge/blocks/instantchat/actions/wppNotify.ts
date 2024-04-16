@@ -1,7 +1,9 @@
 import { createAction, option } from '@typebot.io/forge'
 import { VariableStore } from '@typebot.io/forge'
-import { fetchAgents } from '../fetchers/fetchAgents'
 import { fetchQueues } from '../fetchers/fetchQueues'
+import { fetchTemplates } from '../fetchers/fetchTemplates'
+import { fetchSenders } from '../fetchers/fetchSenders'
+import { fetchUserEmails } from '../fetchers/fetchUserEmails'
 
 const orderTplParams = function (variables: VariableStore) {
   let params: string[] = []
@@ -13,8 +15,18 @@ const orderTplParams = function (variables: VariableStore) {
       if (Number.isNaN(Number(idx))) return
       params[Number(idx)] = v.value as string
     })
-  console.log('DELETEME: Ordered stuff', params)
   return params.filter((p) => p)
+}
+
+const getHeaderUrl = function (templateObj: any, variables: VariableStore) {
+  let varUrl = variables.list().find((v) => v.name === 'HEADER_URL')?.value
+  if (varUrl) return varUrl
+
+  if (templateObj.headerImage) {
+    return templateObj.headerImage
+  }
+
+  return null
 }
 
 export const KWIKAPI_TOKEN = '@kwikapi-token'
@@ -30,6 +42,7 @@ export const wppNotify = createAction({
     from: option.string.layout({
       label: 'From',
       isRequired: true,
+      fetcher: 'fetchSenders',
     }),
     to: option.string.layout({
       label: 'To',
@@ -41,46 +54,53 @@ export const wppNotify = createAction({
       moreInfoTooltip:
         'Informe o código da fila ou escolha a variável que contém essa informação.',
     }),
-    template: option.string.layout({
+    templateData: option.string.layout({
       label: 'Template',
       isRequired: true,
+      fetcher: 'fetchTemplates',
     }),
     agent: option.string.layout({
       label: 'Agent',
-      fetcher: 'fetchAgents',
+      fetcher: 'fetchUserEmails',
       isRequired: true,
     }),
   }),
   run: {
     server: async ({
-      options: { from, to, queue, template, agent },
+      options: { from, to, queue, templateData, agent },
       variables,
       credentials,
     }) => {
-      const { baseUrl } = credentials
-      const tplVars = orderTplParams(variables)
-      console.log('DELETEME: Got tpl vars', tplVars)
-      const url = `${baseUrl}/api/api/whatsapp/medianotification/`
-      let formData = new FormData()
-      // TODO: We need the token
-      // const token =
-      //   window.location.pathname === '/metrics' ? getAdminToken() : getToken()
-      // console.log('DELETEME: Token', token)
+      if (queue && to && from && templateData && agent) {
+        const { baseUrl, kwikToken } = credentials
+        const body = orderTplParams(variables)
+        const templateObj = JSON.parse(templateData)
+        const template = templateObj.name
+        const headerURL = getHeaderUrl(templateObj, variables)
+        const url = `${baseUrl}/api/api/public/v1/notification/`
+        const formData = {
+          queue_name: queue,
+          from,
+          to,
+          template,
+          agent_email: agent,
+          body,
+          headerURL,
+        }
 
-      formData.append('body', 'PAR1')
-      formData.append('body', 'PAR2')
-      if (queue) formData.append('queue_name', queue)
-      if (from) formData.append('from', from)
-      if (to) formData.append('to', to)
-      if (template) formData.append('template', template)
-      if (agent) formData.append('agent', agent)
-
-      const response = await fetch(url, { method: 'POST', body: formData })
-      if (response.status < 300 && response.status >= 200) {
-        const res = await response.json()
-        console.log(res)
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            Authorization: `Token ${kwikToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        })
+        if (response.status < 300 && response.status >= 200) {
+          const res = await response.text()
+        }
       }
     },
   },
-  fetchers: [fetchQueues, fetchAgents],
+  fetchers: [fetchQueues, fetchUserEmails, fetchTemplates, fetchSenders],
 })
