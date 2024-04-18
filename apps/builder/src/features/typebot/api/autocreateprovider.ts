@@ -6,7 +6,7 @@ import { createInstantVariables } from '@/features/typebot/api/autocreatevariabl
 interface Credentials {
   baseUrl: string
   accountcode: string
-  enterpriseId: string
+  enterpriseId?: string
   wsKey?: string
   cortexUrl?: string
   cortexAccountID?: string
