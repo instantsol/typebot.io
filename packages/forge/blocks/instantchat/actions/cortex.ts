@@ -5,9 +5,8 @@ import { defaultCortexOptions } from '../constants'
 import { auth } from '../auth'
 
 export const cortex = createAction({
-  auth,
-  name: 'Cortex',
   baseOptions,
+  name: 'Cortex',
   options: option.object({
     knowledgeBase: option.string.layout({
       label: 'Base de Conhecimento',
@@ -43,7 +42,7 @@ export const cortex = createAction({
     responseMapping ? [responseMapping] : [],
   run: {
     server: async ({ credentials, options, variables }) => {
-      let { cortexToken, baseUrl, cortexUrl } = options
+      let { cortexToken, baseUrl, cortexUrl } = credentials || {}
       const { knowledgeBase, cortexUser } = options
       const initialMessage = options.initialMessage
         ? options.initialMessage
@@ -234,7 +233,7 @@ export const cortex = createAction({
       id: 'fetchKBs',
       dependencies: ['cortexToken', 'cortexUrl', 'cortexAccountID'],
       fetch: async ({ credentials, options }) => {
-        let { cortexAccountID, cortexToken, cortexUrl } = options
+        let { cortexAccountID, cortexToken, cortexUrl } = credentials || {}
         if (cortexUrl && cortexToken && cortexAccountID) {
           const queryParams = {
             limit: '20',
@@ -282,7 +281,7 @@ export const cortex = createAction({
       id: 'fetchCortexUsers',
       dependencies: ['cortexToken', 'cortexUrl', 'cortexAccountID'],
       fetch: async ({ credentials, options }) => {
-        let { cortexAccountID, cortexToken, cortexUrl } = options
+        let { cortexAccountID, cortexToken, cortexUrl } = credentials || {}
         if (cortexUrl && cortexToken && cortexAccountID) {
           const queryParams = {
             limit: '20',

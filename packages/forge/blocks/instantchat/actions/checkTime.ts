@@ -4,7 +4,6 @@ import { baseOptions } from '../baseOptions'
 import { auth } from '../auth'
 
 export const checkTime = createAction({
-  auth,
   name: 'Horário',
   baseOptions,
   options: option.object({
@@ -61,7 +60,7 @@ export const checkTime = createAction({
       id: 'fetchChecktimes',
       dependencies: ['baseUrl', 'accountcode'],
       fetch: async ({ credentials, options }) => {
-        const { baseUrl, accountcode } = options
+        const { baseUrl, accountcode } = credentials || {}
 
         if (baseUrl && accountcode) {
           const url = `${baseUrl}/ivci/webhook/checktime/${accountcode}`
