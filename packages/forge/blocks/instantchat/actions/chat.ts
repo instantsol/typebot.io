@@ -116,7 +116,7 @@ export const chat = createAction({
               variables.set(r.variableId, res.Client?.enterprise_cnpj)
               break
             case 'ID Externo':
-              variables.set(r.variableId, res.Client?.external_id)
+              variables.set(r.variableId, res.Chat?.external_id)
               break
             default:
               break
