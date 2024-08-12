@@ -31,11 +31,11 @@ export const tolgee = Tolgee()
     ],
     fallbackLanguage: 'en',
     staticData: {
+      'pt-BR': ptBR,
+      pt,
       en,
       fr,
       de,
-      pt,
-      'pt-BR': ptBR,
       es,
       ro,
       it,

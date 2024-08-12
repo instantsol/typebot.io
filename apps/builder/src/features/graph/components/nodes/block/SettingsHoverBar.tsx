@@ -28,7 +28,7 @@ export const SettingsHoverBar = ({
   onVideoOnboardingClick,
 }: Props) => {
   const { t } = useTranslate()
-  const helpDocUrl = getHelpDocUrl(blockType, blockDef)
+  const helpUrls = getHelpDocUrl(blockType, blockDef)
   return (
     <HStack
       rounded="md"
@@ -47,7 +47,7 @@ export const SettingsHoverBar = ({
         onClick={onExpandClick}
         size="xs"
       />
-      {helpDocUrl && (
+      {helpUrls && (
         <Button
           as={Link}
           leftIcon={<BuoyIcon />}
@@ -58,7 +58,7 @@ export const SettingsHoverBar = ({
           borderRightWidth={isVideoOnboardingItemDisplayed ? '1px' : undefined}
           size="xs"
           variant="ghost"
-          href={helpDocUrl}
+          href={helpUrls}
           isExternal
         >
           {t('help')}

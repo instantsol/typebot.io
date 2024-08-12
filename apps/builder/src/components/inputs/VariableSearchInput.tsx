@@ -125,6 +125,9 @@ export const VariableSearchInput = ({
 
   const handleDeleteVariableClick =
     (variable: Variable) => (e: React.MouseEvent) => {
+      if (variable.name.startsWith('is_')) {
+        return
+      }
       e.stopPropagation()
       deleteVariable(variable.id)
       setFilteredItems(filteredItems.filter((item) => item.id !== variable.id))
@@ -135,6 +138,9 @@ export const VariableSearchInput = ({
 
   const handleRenameVariableClick =
     (variable: Variable) => (e: React.MouseEvent) => {
+      if (variable.name.startsWith('is_')) {
+        return
+      }
       e.stopPropagation()
       const name = prompt(t('variables.rename'), variable.name)
       if (!name) return
