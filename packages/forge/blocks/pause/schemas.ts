@@ -3,4 +3,3 @@ import { parseBlockCredentials, parseBlockSchema } from '@typebot.io/forge'
 import { pauseBlock } from '.'
 
 export const pauseBlockSchema = parseBlockSchema(pauseBlock)
-export const pauseCredentialsSchema = parseBlockCredentials(pauseBlock)
