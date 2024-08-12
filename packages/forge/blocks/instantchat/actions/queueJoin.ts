@@ -115,6 +115,7 @@ export const queueJoin = createAction({
               iframe.src = '${url}';
               iframe.style.height = '500px';
               iframe.style.width = '100%';
+              iframe.allow='microphone'
               typebotElement.appendChild(iframe); 
             `,
           }
