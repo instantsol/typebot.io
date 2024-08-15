@@ -23,6 +23,8 @@ export interface ZodLayoutMetadata<
   isHidden?: boolean | ((currentObj: Record<string, any>) => boolean)
   isDebounceDisabled?: boolean
   hiddenItems?: string[]
+  mergeWithLastField?: boolean
+  toLabels?: (val?: string) => string | undefined
 }
 
 declare module 'zod' {

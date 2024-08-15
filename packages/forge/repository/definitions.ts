@@ -8,7 +8,6 @@ import { mistralBlock } from '@typebot.io/mistral-block'
 import { qrCodeBlock } from '@typebot.io/qrcode-block'
 import { chatNodeBlock } from '@typebot.io/chat-node-block'
 import { calComBlock } from '@typebot.io/cal-com-block'
-import { zemanticAiBlock } from '@typebot.io/zemantic-ai-block'
 import { openAIBlock } from '@typebot.io/openai-block'
 import { nocodbBlock } from '@typebot.io/nocodb-block'
 import { instantchatBlock } from '@typebot.io/instantchat-block'
@@ -16,7 +15,6 @@ import { pauseBlock } from '@typebot.io/pause-block'
 
 export const forgedBlocks = {
   [openAIBlock.id]: openAIBlock,
-  [zemanticAiBlock.id]: zemanticAiBlock,
   [calComBlock.id]: calComBlock,
   [chatNodeBlock.id]: chatNodeBlock,
   [qrCodeBlock.id]: qrCodeBlock,

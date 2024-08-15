@@ -28,10 +28,7 @@ import { forgedBlockIds } from '@typebot.io/forge-repository/constants'
 import { forgedBlocks } from '@typebot.io/forge-repository/definitions'
 
 // Integration blocks migrated to forged blocks
-const legacyIntegrationBlocks = [
-  IntegrationBlockType.OPEN_AI,
-  IntegrationBlockType.ZEMANTIC_AI,
-]
+const legacyIntegrationBlocks = [IntegrationBlockType.OPEN_AI]
 
 const getInstantAIOActions = () => {
   const block = forgedBlocks['instantchat']

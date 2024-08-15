@@ -6,7 +6,6 @@
   "dependencies": {
     "@typebot.io/lib": "workspace:*",
     "@typebot.io/tsconfig": "workspace:*",
-    "isolated-vm": "4.7.2",
-    "@paralleldrive/cuid2": "2.2.1"
+    "isolated-vm": "5.0.1"
   }
 }
