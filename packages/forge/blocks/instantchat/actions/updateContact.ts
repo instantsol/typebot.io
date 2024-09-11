@@ -41,6 +41,7 @@ export const updateContact = createAction({
           platform        : variables.list().find((v) => v.name === 'is_platform')?.value,
           client_id       : variables.list().find((v) => v.name === 'is_clientid')?.value,
           accountcode     : variables.list().find((v) => v.name === 'is_accountcode')?.value,
+          unique_id       : variables.list().find((v) => v.name === 'is_uniqueid')?.value,
           internal_code   : internal_code,
           name            : name,
           telephone       : telephone,
