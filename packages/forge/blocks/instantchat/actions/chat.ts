@@ -23,6 +23,7 @@ export const chat = createAction({
         'Dado Adicional 2 (chave)',
         'Dado Adicional 2 (valor)',
         'Mensagens',
+        'Mensagens Atendimento',
         'Nome do Agente',
         'Fila do Agente',
         'Email do Agente',
@@ -87,6 +88,9 @@ export const chat = createAction({
               break
             case 'Mensagens':
               variables.set(r.variableId, res.Chat?.messages)
+              break
+            case 'Mensagens Atendimento':
+              variables.set(r.variableId, res.Chat?.onchat_messages)
               break
             case 'Nome do Agente':
               variables.set(r.variableId, res.Chat?.agent_name)
