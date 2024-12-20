@@ -17,6 +17,7 @@ export const choiceInputOptionsSchema = optionBaseSchema.merge(
 export const buttonItemSchemas = {
   v5: itemBaseSchemas.v5.extend({
     content: z.string().optional(),
+    redirectUrl: z.string().optional(),
     displayCondition: z
       .object({
         isEnabled: z.boolean().optional(),
@@ -26,6 +27,7 @@ export const buttonItemSchemas = {
   }),
   v6: itemBaseSchemas.v6.extend({
     content: z.string().optional(),
+    redirectUrl: z.string().optional(),
     displayCondition: z
       .object({
         isEnabled: z.boolean().optional(),
