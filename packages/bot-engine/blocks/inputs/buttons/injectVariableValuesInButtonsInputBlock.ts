@@ -30,7 +30,9 @@ export const injectVariableValuesInButtonsInputBlock =
         })),
       }
     }
-    return deepParseVariables(variables)(filterChoiceItems(variables)(block))
+    return deepParseVariables(variables)(
+      filterChoiceItems(variables)(block, state)
+    )
   }
 
 const getVariableValue =
