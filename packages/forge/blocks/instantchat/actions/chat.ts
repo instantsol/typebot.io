@@ -32,7 +32,7 @@ export const chat = createAction({
         'Código do cliente',
         'Email do cliente',
         'Empresa do cliente',
-        'CPF/CNPJ do cliente',
+        'CPF do cliente',
         'ID Externo',
       ] as const)
       .layout({
@@ -116,8 +116,8 @@ export const chat = createAction({
             case 'Empresa do cliente':
               variables.set(r.variableId, res.Client?.enterprise_name)
               break
-            case 'CPF/CNPJ do cliente':
-              variables.set(r.variableId, res.Client?.enterprise_cnpj)
+            case 'CPF do cliente':
+              variables.set(r.variableId, res.Client?.cpf)
               break
             case 'ID Externo':
               variables.set(r.variableId, res.Chat?.external_id)

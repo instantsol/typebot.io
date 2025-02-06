@@ -20,16 +20,16 @@ export const updateContact = createAction({
     enterprise_name: option.string.layout({
       label: 'Empresa'
     }),
-    enterprise_cnpj: option.string.layout({
-      label: 'CPF/CNPJ'
+    cpf: option.string.layout({
+      label: 'CPF'
     }),
     customer_code: option.string.layout({
-      label: 'Código do cliente'
+      label: 'Código'
     })
   }),
   run: {
     server: async ({
-      options: { internal_code, name, telephone, email, enterprise_name, enterprise_cnpj, customer_code },
+      options: { internal_code, name, telephone, email, enterprise_name, cpf, customer_code },
       variables,
       credentials,
     }) => {
@@ -47,7 +47,7 @@ export const updateContact = createAction({
           telephone       : telephone,
           email           : email,
           enterprise_name : enterprise_name,
-          enterprise_cnpj : enterprise_cnpj,
+          cpf             : cpf,
           customer_code   : customer_code,
         })
       })
