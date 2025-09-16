@@ -11,7 +11,7 @@ type Props = {
 export const EmbedBubbleContent = ({ block }: Props) => {
   const { typebot } = useTypebot()
   const { t } = useTranslate()
-  if (!block.content?.url)
+  if (!(block.content?.url || block.content?.link?.isEnabled))
     return <Text color="gray.500">{t('clickToEdit')}</Text>
   return (
     <Stack>
