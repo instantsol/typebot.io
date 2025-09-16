@@ -1,4 +1,4 @@
-import { TextInput, NumberInput } from '@/components/inputs'
+import { TextInput, NumberInput, Textarea } from '@/components/inputs'
 import { Stack, Text } from '@chakra-ui/react'
 import { EmbedBubbleBlock, Variable } from '@typebot.io/schemas'
 import { sanitizeUrl } from '@typebot.io/lib'
@@ -43,45 +43,88 @@ export const EmbedUploadContent = ({ content, onSubmit }: Props) => {
       },
     })
 
+  const updateLinkButton = (isEnabled: boolean) =>
+    onSubmit({ ...content, link: { ...content?.link, isEnabled } })
+
+  const updateLinkText = (text: string) =>
+    onSubmit({ ...content, link: { ...content?.link, text } })
+
+  const updateLinkName = (name: string) =>
+    onSubmit({ ...content, link: { ...content?.link, name } })
+
+  const updateLinkUrl = (url: string) =>
+    onSubmit({ ...content, link: { ...content?.link, url } })
+
   return (
     <Stack p="2" spacing={6}>
       <Stack>
-        <TextInput
-          placeholder={t(
-            'editor.blocks.bubbles.embed.settings.worksWith.placeholder'
-          )}
-          defaultValue={content?.url ?? ''}
-          onChange={handleUrlChange}
-        />
-        <Text fontSize="sm" color="gray.400" textAlign="center">
-          {t('editor.blocks.bubbles.embed.settings.worksWith.text')}
-        </Text>
+        <SwitchWithRelatedSettings
+          label={t('blocks.inputs.settings.link.enabled.label')}
+          initialValue={content?.link?.isEnabled ?? false}
+          onCheckChange={updateLinkButton}
+        >
+          <Textarea
+            width="full"
+            //label={t('blocks.inputs.settings.link.text.label')}
+            placeholder={t('blocks.inputs.settings.link.text.label')}
+            defaultValue={content?.link?.text}
+            onChange={updateLinkText}
+          />
+          <TextInput
+            direction="row"
+            label={t('blocks.inputs.settings.link.name.label')}
+            defaultValue={content?.link?.name}
+            onChange={updateLinkName}
+          />
+          <TextInput
+            direction="row"
+            label={t('blocks.inputs.settings.link.url.label')}
+            defaultValue={content?.link?.url}
+            onChange={updateLinkUrl}
+          />
+        </SwitchWithRelatedSettings>
       </Stack>
 
-      <NumberInput
-        label="Height:"
-        defaultValue={content?.height ?? defaultEmbedBubbleContent.height}
-        onValueChange={handleHeightChange}
-        suffix={t('editor.blocks.bubbles.embed.settings.numberInput.unit')}
-        direction="row"
-      />
-      <SwitchWithRelatedSettings
-        label="Wait for event?"
-        initialValue={content?.waitForEvent?.isEnabled ?? false}
-        onCheckChange={updateWaitForEventEnabled}
-      >
-        <TextInput
-          direction="row"
-          label="Name:"
-          defaultValue={content?.waitForEvent?.name}
-          onChange={updateWaitEventName}
-        />
-        <VariableSearchInput
-          onSelectVariable={updateSaveDataInVariableId}
-          initialVariableId={content?.waitForEvent?.saveDataInVariableId}
-          label="Save data in variable"
-        />
-      </SwitchWithRelatedSettings>
+      {!content?.link?.isEnabled && (
+        <>
+          <Stack>
+            <TextInput
+              placeholder={t(
+                'editor.blocks.bubbles.embed.settings.worksWith.placeholder'
+              )}
+              defaultValue={content?.url ?? ''}
+              onChange={handleUrlChange}
+            />
+            <Text fontSize="sm" color="gray.400" textAlign="center">
+              {t('editor.blocks.bubbles.embed.settings.worksWith.text')}
+            </Text>
+          </Stack>
+          <NumberInput
+            label="Height:"
+            defaultValue={content?.height ?? defaultEmbedBubbleContent.height}
+            onValueChange={handleHeightChange}
+            suffix={t('editor.blocks.bubbles.embed.settings.numberInput.unit')}
+            direction="row"
+          />
+          <SwitchWithRelatedSettings
+            label="Wait for event?"
+            initialValue={content?.waitForEvent?.isEnabled ?? false}
+            onCheckChange={updateWaitForEventEnabled}
+          >
+            <TextInput
+              direction="row"
+              label="Name:"
+              defaultValue={content?.waitForEvent?.name}
+              onChange={updateWaitEventName}
+            />
+            <VariableSearchInput
+              onSelectVariable={updateSaveDataInVariableId}
+              initialVariableId={content?.waitForEvent?.saveDataInVariableId}
+              label="Save data in variable"
+            />
+          </SwitchWithRelatedSettings>
+        </>
+      )}
     </Stack>
   )
 }
