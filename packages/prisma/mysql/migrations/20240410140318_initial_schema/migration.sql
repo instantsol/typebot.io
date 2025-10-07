@@ -251,10 +251,22 @@ CREATE TABLE `Result` (
     `isCompleted` BOOLEAN NOT NULL,
     `hasStarted` BOOLEAN NULL,
     `isArchived` BOOLEAN NULL DEFAULT false,
+    `lastChatSessionId` VARCHAR(191) NULL,
 
     INDEX `Result_typebotId_isArchived_hasStarted_createdAt_idx`(`typebotId`, `isArchived`, `hasStarted`, `createdAt` DESC),
     INDEX `Result_typebotId_isArchived_isCompleted_idx`(`typebotId`, `isArchived`, `isCompleted`),
     PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `SetVariableHistoryItem` (
+    `resultId` VARCHAR(191) NOT NULL,
+    `index` INTEGER NOT NULL,
+    `variableId` VARCHAR(191) NOT NULL,
+    `blockId` VARCHAR(191) NOT NULL,
+    `value` JSON NOT NULL,
+
+    UNIQUE INDEX `SetVariableHistoryItem_resultId_index_key`(`resultId`, `index`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -284,15 +296,25 @@ CREATE TABLE `Answer` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `resultId` VARCHAR(191) NOT NULL,
     `blockId` VARCHAR(191) NOT NULL,
-    `itemId` VARCHAR(191) NULL,
     `groupId` VARCHAR(191) NOT NULL,
     `variableId` VARCHAR(191) NULL,
     `content` TEXT NOT NULL,
-    `storageUsed` INTEGER NULL,
 
-    INDEX `Answer_blockId_itemId_idx`(`blockId`, `itemId`),
-    INDEX `Answer_storageUsed_idx`(`storageUsed`),
     UNIQUE INDEX `Answer_resultId_blockId_groupId_key`(`resultId`, `blockId`, `groupId`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `AnswerV2` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `blockId` VARCHAR(191) NOT NULL,
+    `content` TEXT NOT NULL,
+    `attachedFileUrls` JSON NULL,
+    `resultId` VARCHAR(191) NOT NULL,
+
+    INDEX `AnswerV2_resultId_idx`(`resultId`),
+    INDEX `AnswerV2_blockId_idx`(`blockId`),
+    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -349,6 +371,7 @@ CREATE TABLE `ChatSession` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `state` JSON NOT NULL,
+    `isReplying` BOOLEAN NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
