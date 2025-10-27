@@ -68,6 +68,7 @@ export const MediaBubbleContent = ({
     case BubbleBlockType.EMBED: {
       return (
         <EmbedUploadContent
+          uploadFileProps={uploadFileProps}
           content={block.content}
           onSubmit={onContentChange}
         />

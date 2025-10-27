@@ -6,9 +6,9 @@ import { trpc } from '@/lib/trpc'
 import { compressFile } from '@/helpers/compressFile'
 
 type UploadButtonProps = {
-  fileType: 'image' | 'audio'
+  fileType: 'image' | 'audio' | string
   filePathProps: FilePathUploadProps
-  onFileUploaded: (url: string) => void
+  onFileUploaded: (url: string, name?: string) => void
 } & ButtonProps
 
 export const UploadButton = ({
@@ -42,7 +42,7 @@ export const UploadButton = ({
         return
       }
 
-      onFileUploaded(data.fileUrl + '?v=' + Date.now())
+      onFileUploaded(data.fileUrl + '?v=' + Date.now(), file.name)
     },
   })
 
@@ -67,7 +67,7 @@ export const UploadButton = ({
         id="file-input"
         display="none"
         onChange={handleInputChange}
-        accept={fileType === 'image' ? 'image/*' : 'audio/*'}
+        accept={fileType + '/*'} // === 'image' ? 'image/*' : 'audio/*'}
       />
       <Button
         as="label"
