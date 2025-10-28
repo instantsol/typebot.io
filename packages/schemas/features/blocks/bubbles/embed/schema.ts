@@ -5,6 +5,7 @@ import { BubbleBlockType } from '../constants'
 
 export const embedBubbleContentSchema = z.object({
   url: z.string().optional(),
+  filename: z.string().optional(),
   link: z
     .object({
       isEnabled: z.boolean().optional(),

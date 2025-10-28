@@ -180,23 +180,29 @@ const BodyContent = ({
   }
 }
 
-type ContentProps = { onNewUrl: (url: string) => void }
+type ContentProps = { onNewUrl: (url: string, name?: string) => void }
 
-const UploadFileContent = ({
+export const UploadFileContent = ({
   uploadFileProps,
   onNewUrl,
-}: ContentProps & { uploadFileProps: FilePathUploadProps }) => {
+  replaceText,
+  replaceType,
+}: ContentProps & {
+  uploadFileProps: FilePathUploadProps
+  replaceText?: string
+  replaceType?: string
+}) => {
   const { t } = useTranslate()
 
   return (
     <Flex justify="center" py="2">
       <UploadButton
-        fileType="image"
+        fileType={replaceType || 'image'}
         filePathProps={uploadFileProps}
         onFileUploaded={onNewUrl}
         colorScheme="blue"
       >
-        {t('editor.header.uploadTab.uploadButton.label')}
+        {replaceText || t('editor.header.uploadTab.uploadButton.label')}
       </UploadButton>
     </Flex>
   )

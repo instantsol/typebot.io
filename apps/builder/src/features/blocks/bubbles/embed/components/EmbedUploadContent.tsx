@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { TextInput, NumberInput, Textarea } from '@/components/inputs'
 import { Stack, Text } from '@chakra-ui/react'
 import { EmbedBubbleBlock, Variable } from '@typebot.io/schemas'
@@ -6,14 +7,22 @@ import { useTranslate } from '@tolgee/react'
 import { defaultEmbedBubbleContent } from '@typebot.io/schemas/features/blocks/bubbles/embed/constants'
 import { SwitchWithRelatedSettings } from '@/components/SwitchWithRelatedSettings'
 import { VariableSearchInput } from '@/components/inputs/VariableSearchInput'
+import { UploadFileContent } from '@/components/ImageUploadContent/ImageUploadContent'
+import { FilePathUploadProps } from '@/features/upload/api/generateUploadUrl'
 
 type Props = {
+  uploadFileProps: FilePathUploadProps
   content: EmbedBubbleBlock['content']
   onSubmit: (content: EmbedBubbleBlock['content']) => void
 }
 
-export const EmbedUploadContent = ({ content, onSubmit }: Props) => {
+export const EmbedUploadContent = ({
+  uploadFileProps,
+  content,
+  onSubmit,
+}: Props) => {
   const { t } = useTranslate()
+  const [key, setKey] = useState(0)
   const handleUrlChange = (url: string) => {
     const iframeUrl = sanitizeUrl(
       url.trim().startsWith('<iframe') ? extractUrlFromIframe(url) : url
@@ -49,6 +58,18 @@ export const EmbedUploadContent = ({ content, onSubmit }: Props) => {
   const updateLinkText = (text: string) =>
     onSubmit({ ...content, link: { ...content?.link, text } })
 
+  const updateFileNameAndUrl = (url?: string, text?: string) => {
+    onSubmit({
+      ...content,
+      url: url || content?.url || '',
+      filename: text || content?.filename || '',
+    })
+    setKey(Math.random())
+  }
+
+  const updateFileName = (text: string) =>
+    onSubmit({ ...content, filename: text })
+
   const updateLinkName = (name: string) =>
     onSubmit({ ...content, link: { ...content?.link, name } })
 
@@ -65,7 +86,6 @@ export const EmbedUploadContent = ({ content, onSubmit }: Props) => {
         >
           <Textarea
             width="full"
-            //label={t('blocks.inputs.settings.link.text.label')}
             placeholder={t('blocks.inputs.settings.link.text.label')}
             defaultValue={content?.link?.text}
             onChange={updateLinkText}
@@ -89,6 +109,7 @@ export const EmbedUploadContent = ({ content, onSubmit }: Props) => {
         <>
           <Stack>
             <TextInput
+              key={`content-url-${key}`}
               placeholder={t(
                 'editor.blocks.bubbles.embed.settings.worksWith.placeholder'
               )}
@@ -98,6 +119,20 @@ export const EmbedUploadContent = ({ content, onSubmit }: Props) => {
             <Text fontSize="sm" color="gray.400" textAlign="center">
               {t('editor.blocks.bubbles.embed.settings.worksWith.text')}
             </Text>
+            <UploadFileContent
+              uploadFileProps={uploadFileProps}
+              onNewUrl={updateFileNameAndUrl}
+              replaceType={'all'}
+              replaceText={t('editor.header.uploadTab.uploadButtonFile.label')}
+            />
+
+            <TextInput
+              key={`content-filename-${key}`}
+              width="full"
+              label={t('editor.blocks.bubbles.embed.settings.fileName.text')}
+              defaultValue={content?.filename ?? ''}
+              onChange={updateFileName}
+            />
           </Stack>
           <NumberInput
             label="Height:"
