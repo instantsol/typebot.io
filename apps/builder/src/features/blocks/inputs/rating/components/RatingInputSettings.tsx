@@ -144,17 +144,6 @@ export const RatingInputSettings = ({ options, onOptionsChange }: Props) => {
         justifyContent={'space-between'}
         key={`variable-stack-key-${key}`}
       >
-        <Stack direction={'column'} width={'100%'} sx={{ width: '100%' }}>
-          <FormLabel mb="0" htmlFor="button">
-            {t('blocks.inputs.rating.settings.maximum.label')}
-          </FormLabel>
-          <DropdownList
-            isDisabled={options?.type !== 'NUMBER'}
-            onItemSelect={handleLengthChange}
-            items={[2, 3, 4, 5, 6, 7, 8, 9, 10]}
-            currentItem={length}
-          />
-        </Stack>
         <Stack width={'100%'}>
           {buttonType === 'Numbers' && (
             <NumberInput
@@ -167,6 +156,17 @@ export const RatingInputSettings = ({ options, onOptionsChange }: Props) => {
               direction="column"
             />
           )}
+        </Stack>
+        <Stack direction={'column'} width={'100%'} sx={{ width: '100%' }}>
+          <FormLabel mb="0" htmlFor="button">
+            {t('blocks.inputs.rating.settings.maximum.label')}
+          </FormLabel>
+          <DropdownList
+            isDisabled={options?.type !== 'NUMBER'}
+            onItemSelect={handleLengthChange}
+            items={[2, 3, 4, 5, 6, 7, 8, 9, 10]}
+            currentItem={length}
+          />
         </Stack>
       </Stack>
 
