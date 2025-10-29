@@ -1,22 +1,12 @@
 import { FormLabel, Stack } from '@chakra-ui/react'
 import { DropdownList } from '@/components/DropdownList'
 import { RatingInputBlock, Variable } from '@typebot.io/schemas'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { SwitchWithLabel } from '@/components/inputs/SwitchWithLabel'
 import { NumberInput, TextInput, Textarea } from '@/components/inputs'
 import { VariableSearchInput } from '@/components/inputs/VariableSearchInput'
 import { defaultRatingInputOptions } from '@typebot.io/schemas/features/blocks/inputs/rating/constants'
 import { useTranslate } from '@tolgee/react'
-import { tolgee } from '@/lib/tolgee'
-
-const survey_type_object = [
-  { label: 'NPS', value: 'NPS' },
-  { label: 'CSAT', value: 'CSAT' },
-  { label: tolgee.t('blocks.inputs.rating.type.numbers'), value: 'NUMBER' },
-  //{'label': tolgee.t('blocks.inputs.rating.type.comment'), value: 'COMMENT'}
-]
-
-type SurveyType = (typeof survey_type_object)[number]['label']
 
 type Props = {
   options: RatingInputBlock['options']
@@ -26,6 +16,17 @@ type Props = {
 export const RatingInputSettings = ({ options, onOptionsChange }: Props) => {
   const { t } = useTranslate()
   const [key, setKey] = useState(0)
+
+  const survey_type_object = useMemo(
+    () => [
+      { label: 'NPS', value: 'NPS' },
+      { label: 'CSAT', value: 'CSAT' },
+      { label: t('blocks.inputs.rating.type.numbers'), value: 'NUMBER' },
+    ],
+    [t]
+  )
+
+  type SurveyType = (typeof survey_type_object)[number]['label']
 
   const handleLengthChange = (length: number) => {
     const update = { ...options, length: length }

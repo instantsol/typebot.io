@@ -187,7 +187,7 @@
   "blocks.inputs.rating.from.label": "Avalie de",
   "blocks.inputs.rating.name": "Nome da pesquisa",
   "blocks.inputs.rating.type.label": "Tipo de pesquisa",
-  "blocks.inputs.rating.type.numbers": "Números",
+  "blocks.inputs.rating.type.numbers": "Aberta",
   "blocks.inputs.rating.type.comment": "Comentários",
   "blocks.inputs.rating.text": "Mensagem da pesquisa",
   "blocks.inputs.rating.settings.customIcon.label": "Customizar ícone?",
