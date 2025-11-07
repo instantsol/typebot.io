@@ -22,6 +22,9 @@ export const ratingInputOptionsSchema = optionBaseSchema.merge(
       })
       .optional(),
     isOneClickSubmitEnabled: z.boolean().optional(),
+    name: z.string().optional(),
+    type: z.string().optional(),
+    text: z.string().optional()
   })
 )
 
@@ -38,3 +41,8 @@ export const ratingInputBlockSchema = blockBaseSchema
   })
 
 export type RatingInputBlock = z.infer<typeof ratingInputBlockSchema>
+
+
+
+
+

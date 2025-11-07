@@ -15,13 +15,20 @@ export const RatingInputContent = ({ variableId, block }: Props) => {
   return variableId ? (
     <WithVariableContent variableId={variableId} />
   ) : (
-    <Text noOfLines={1} pr="6">
-      {t('blocks.inputs.rating.from.label')}{' '}
-      {block.options?.buttonType === 'Icons'
-        ? 1
-        : block.options?.startsAt ?? defaultRatingInputOptions.startsAt}{' '}
-      {t('blocks.inputs.rating.to.label')}{' '}
-      {block.options?.length ?? defaultRatingInputOptions.length}
+    <Text noOfLines={4} pr="6" sx={{ whiteSpace: 'break-spaces' }}>
+      {(block.options?.text || '').length > 0 ? (
+        block.options?.text
+      ) : (
+        <>
+          {t('blocks.inputs.rating.from.label')}{' '}
+          {block.options?.buttonType === 'Icons'
+            ? 1
+            : block.options?.startsAt ??
+              defaultRatingInputOptions.startsAt}{' '}
+          {t('blocks.inputs.rating.to.label')}{' '}
+          {block.options?.length ?? defaultRatingInputOptions.length}
+        </>
+      )}
     </Text>
   )
 }

@@ -5,6 +5,8 @@ import { createSignal, For, Match, Switch, Show } from 'solid-js'
 import { isDefined, isEmpty, isNotDefined } from '@typebot.io/lib'
 import { Button } from '@/components/Button'
 import { defaultRatingInputOptions } from '@typebot.io/schemas/features/blocks/inputs/rating/constants'
+import { TextBubble } from '@/features/blocks/bubbles/textBubble'
+import { TextBubbleBlock } from '@typebot.io/schemas'
 
 type Props = {
   block: RatingInputBlock
@@ -32,6 +34,28 @@ export const RatingForm = (props: Props) => {
 
   return (
     <form class="flex flex-col gap-2" onSubmit={handleSubmit}>
+      {props.block.options?.text && (
+        <TextBubble
+          content={
+            {
+              type: 'richText',
+              richText: [
+                {
+                  type: 'p',
+                  children: [
+                    {
+                      text: props.block.options?.text,
+                    },
+                  ],
+                },
+              ],
+            } as TextBubbleBlock['content']
+          }
+          isTypingSkipped={true}
+          typingEmulation={undefined}
+          onTransitionEnd={() => {}}
+        />
+      )}
       {props.block.options?.labels?.left && (
         <span class="text-sm w-full rating-label">
           {props.block.options.labels.left}

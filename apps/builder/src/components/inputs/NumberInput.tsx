@@ -131,7 +131,9 @@ export const NumberInput = <HasVariable extends boolean>({
         {withVariableButton ?? true ? (
           <HStack spacing="0" w="full">
             {Input}
-            <VariablesButton onSelectVariable={handleVariableSelected} />
+            {!props.isDisabled && (
+              <VariablesButton onSelectVariable={handleVariableSelected} />
+            )}
           </HStack>
         ) : (
           Input
