@@ -19,9 +19,9 @@ export const RatingInputSettings = ({ options, onOptionsChange }: Props) => {
 
   const survey_type_object = useMemo(
     () => [
+      { label: t('blocks.inputs.rating.type.numbers'), value: 'NUMBER' },
       { label: 'NPS', value: 'NPS' },
       { label: 'CSAT', value: 'CSAT' },
-      { label: t('blocks.inputs.rating.type.numbers'), value: 'NUMBER' },
     ],
     [t]
   )
@@ -110,7 +110,7 @@ export const RatingInputSettings = ({ options, onOptionsChange }: Props) => {
     defaultRatingInputOptions.isOneClickSubmitEnabled
 
   const buttonType = options?.buttonType ?? defaultRatingInputOptions.buttonType
-  const type = options?.type ?? survey_type_object[0].label
+  const type = options?.type ?? survey_type_object[0].value
   return (
     <Stack spacing={4}>
       <Stack>
@@ -147,7 +147,7 @@ export const RatingInputSettings = ({ options, onOptionsChange }: Props) => {
         <Stack width={'100%'}>
           {buttonType === 'Numbers' && (
             <NumberInput
-              isDisabled={options?.type !== 'NUMBER'}
+              isDisabled={type !== 'NUMBER'}
               defaultValue={
                 options?.startsAt ?? defaultRatingInputOptions.startsAt
               }
@@ -162,7 +162,7 @@ export const RatingInputSettings = ({ options, onOptionsChange }: Props) => {
             {t('blocks.inputs.rating.settings.maximum.label')}
           </FormLabel>
           <DropdownList
-            isDisabled={options?.type !== 'NUMBER'}
+            isDisabled={type !== 'NUMBER'}
             onItemSelect={handleLengthChange}
             items={[2, 3, 4, 5, 6, 7, 8, 9, 10]}
             currentItem={length}
