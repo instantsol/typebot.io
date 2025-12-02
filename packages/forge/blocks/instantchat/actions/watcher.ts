@@ -26,7 +26,7 @@ export const watcher = createAction({
           const hash = variables
             .list()
             .find((v) => v.name === "is_contactid")?.value
-          const domain = "dev03.instantsandbox.net"
+          const domain = window.location.hostname
           const socketURL = `wss://${domain}/chat/ws/chat/${hash}/`
           const iframeURL = `https://${domain}/builder_chat/${hash}/`
           return {
