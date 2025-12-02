@@ -37,7 +37,7 @@ export const watcher = createAction({
                 const container = typebot.shadowRoot
                 const chunks = container.querySelectorAll(".typebot-chat-chunk")
                 const lastChunk = chunks[chunks.length-1]
-                lastChunk.innerHTML = "";
+                lastChunk.innerHTML = ""
                 lastChunk.appendChild(element)
               }
 
@@ -64,28 +64,48 @@ export const watcher = createAction({
                 return iframe
               }
 
-              const socketURL = "${socketURL}"
-              const iframeURL = "${iframeURL}"
-              
-              const socket = new WebSocket(socketURL)
-              
-              socket.onmessage = (event) => {
-                const data = JSON.parse(event.data)
-                switch (data.user) {
-                  case -5:
-                    const hangupMessage = getHangupMessage()
-                    replaceLastChunkWith(hangupMessage)
-                    break
-                  case -4:
-                    const chatFrame = getChatFrame(iframeURL)
-                    replaceLastChunkWith(chatFrame)
-                  default:
-                    console.log("Unknown event")
-                    break
-                }
-                socket.close()
-              }
+              const connectWebSocket = () => {
+                const socketURL = "${socketURL}"
+                const iframeURL = "${iframeURL}"
+                
+                const socket = new WebSocket(socketURL)
 
+                let keepAlive = null
+
+                socket.onopen = (event) => {
+                  keepAlive = setInterval(() => {
+                    socket.send(JSON.stringify({
+                      user: "0",
+                      message: "PING"
+                    }))
+                  }, 20000)
+                }
+
+                socket.onmessage = (event) => {
+                  const data = JSON.parse(event.data)
+                  switch (data.user) {
+                    case -5:
+                      const hangupMessage = getHangupMessage()
+                      replaceLastChunkWith(hangupMessage)
+                      socket.close()
+                      break
+                    case -4:
+                      const chatFrame = getChatFrame(iframeURL)
+                      replaceLastChunkWith(chatFrame)
+                      socket.close()
+                      break
+                    default:
+                      console.log("Unknown event")
+                      break
+                  }
+                }
+
+                socket.onclose = (event) => {
+                  clearInterval(keepAlive)
+                }
+              }
+              
+              connectWebSocket()  
               hideFirstChunk()
             `,
           }
