@@ -32,21 +32,21 @@ export const watcher = createAction({
           return {
             args: {},
             content: `
-              const replaceLastChunkWith = (element) => {
+              const replaceLastElementWith = (element) => {
                 const typebot = document.querySelector("typebot-standard")
                 const container = typebot.shadowRoot
                 const chunks = container.querySelectorAll(".typebot-chat-chunk")
-                const lastChunk = chunks[chunks.length-1]
-                lastChunk.innerHTML = ""
-                lastChunk.appendChild(element)
+                const lastElement = chunks[chunks.length-1]
+                lastElement.innerHTML = ""
+                lastElement.appendChild(element)
               }
 
-              const hideFirstChunk = () => {
+              const removeFirstElement = () => {
                 const typebot = document.querySelector("typebot-standard")
                 const container = typebot.shadowRoot
                 const chunks = container.querySelectorAll(".typebot-chat-chunk")
-                const firstChunk = chunks[0]
-                firstChunk.style.display = "none"
+                const firstElement = chunks[0]
+                firstElement.style.display = "none"
               }
 
               const getHangupMessage = () => {
@@ -83,21 +83,25 @@ export const watcher = createAction({
 
                 socket.onmessage = (event) => {
                   const data = JSON.parse(event.data)
+
+                  if (data.user == 0 && data.message == "PONG") {
+                    return
+                  }
+
                   switch (data.user) {
                     case -5:
                       const hangupMessage = getHangupMessage()
-                      replaceLastChunkWith(hangupMessage)
-                      socket.close()
+                      replaceLastElementWith(hangupMessage)
                       break
                     case -4:
                       const chatFrame = getChatFrame(iframeURL)
-                      replaceLastChunkWith(chatFrame)
-                      socket.close()
+                      replaceLastElementWith(chatFrame)
                       break
                     default:
                       console.log("Unknown event")
                       break
                   }
+                  socket.close()
                 }
 
                 socket.onclose = (event) => {
@@ -106,7 +110,7 @@ export const watcher = createAction({
               }
               
               connectWebSocket()  
-              hideFirstChunk()
+              removeFirstElement()
             `,
           }
         },
