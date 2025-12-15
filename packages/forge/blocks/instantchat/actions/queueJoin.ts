@@ -64,39 +64,42 @@ export const queueJoin = createAction({
             return {
               args: {},
               content: `
-              function showNotification() {
-
-                function createNotification() {
-                  const notification = new Notification("Nova mensagem!", {
-                    'body': "Você recebeu uma nova mensagem."
-                  });
-                }
-
-                if (!("Notification" in window)) {
-                    console.error("This browser do not suport notifications.");
-                    return;
-                }
-
-                if (Notification.permission !== 'granted') {
-                    console.log("solicitando permissão")
-                    Notification.requestPermission().then((permission) => {
-                        if (permission === 'granted') {
-                          createNotification();
-                        }
+                function showNotification() {
+                  function createNotification() {
+                    const notification = new Notification("Nova mensagem!", {
+                      'body': "Você recebeu uma nova mensagem."
                     });
-                } else {
-                    createNotification();
-                }
-              }
+                  }
 
-              window.addEventListener('message', function (event) {
-                if (event && 'kwikEvent' in event.data && event.data.kwikEvent === 'close-chat'){
-                  continueFlow('Chat encerrado pelo operador');
+                  if (!("Notification" in window)) {
+                      console.error("This browser do not suport notifications.");
+                      return;
+                  }
+
+                  if (Notification.permission !== 'granted') {
+                      console.log("solicitando permissão")
+                      Notification.requestPermission().then((permission) => {
+                          if (permission === 'granted') {
+                            createNotification();
+                          }
+                      });
+                  } else {
+                      createNotification();
+                  }
                 }
-                if (event && 'webchatEvent' in event.data && event.data.webchatEvent === 'show-notification'){
-                  showNotification();
+
+                function onMessage(event) {
+                  if (event?.data?.kwikEvent === 'close-chat') {
+                    continueFlow('Chat encerrado pelo operador');
+                    window.removeEventListener('message', onMessage);
+                  }
+
+                  if (event?.data?.webchatEvent === 'show-notification') {
+                    showNotification();
+                  }
                 }
-              });
+
+                window.addEventListener('message', onMessage);
               `,
             }
           },
