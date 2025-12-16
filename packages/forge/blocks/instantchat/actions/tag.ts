@@ -36,25 +36,6 @@ export const tag = createAction({
         )
       }
     },
-    web: {
-      displayEmbedBubble: {
-        parseUrl: ({}) => '',
-        waitForEvent: {
-          parseFunction: () => {
-            return {
-              args: {},
-              content: ``,
-            }
-          },
-        },
-        parseInitFunction: ({ options, variables, credentials }) => {
-          return {
-            args: {},
-            content: ``,
-          }
-        },
-      },
-    },
   },
   fetchers: [fetchTags],
 })
