@@ -63,18 +63,16 @@ export const opportunity = createAction({
         .list()
         .find((v) => v.name === 'is_clientid')?.value
       let parsedValue: number | null = null
-      if (value !== undefined && value !== null) {
+      if (value !== undefined && value !== null && value !== '') {
         const normalized =
           typeof value === 'string'
             ? value.replace(/\./g, '').replace(',', '.')
             : value
         const num = Number(normalized)
-        if (!Number.isNaN(num)) {
-          parsedValue = num
+        if (Number.isNaN(num)) {
+          throw new Error('Valor inválido')
         }
-      }
-      if (parsedValue === null) {
-        throw new Error('Valor inválido')
+        parsedValue = num
       }
       const url = `${baseUrl}/ivci/webhook/create_opportunity?page_id=${id_chatbot}&sender_id=${id_cliente}`
       const response = await fetch(url, {
