@@ -34,11 +34,20 @@ export const checkTime = createAction({
       const uniqueid =
         variables.list().find((v) => v.name === 'is_uniqueid')?.value || ''
 
+      const id_chatbot = variables
+        .list()
+        .find((v) => v.name === 'is_chatbotid')?.value
+      const id_cliente = variables
+        .list()
+        .find((v) => v.name === 'is_clientid')?.value
+
       let result = false
       if (accountcode && checktime) {
         const params = new URLSearchParams({
           accountcode: accountcode.toString(),
           checktime: checktime,
+          page_id: String(id_chatbot ?? ""),
+          user_id: String(id_cliente ?? ""),
           uniqueid: uniqueid.toString(),
         })
         process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
