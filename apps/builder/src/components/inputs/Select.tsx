@@ -60,8 +60,11 @@ export const Select = <T extends Item>({
   )
 
   useEffect(() => {
-    if (!items || typeof items[0] === 'string' || !selectedItem || isTouched)
+    if (!items || typeof items[0] === 'string' || isTouched) return
+    if (!selectedItem) {
+      setInputValue('')
       return
+    }
     setInputValue(
       getItemLabel(
         (items as readonly RichItem[]).find(

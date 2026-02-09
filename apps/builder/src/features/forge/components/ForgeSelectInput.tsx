@@ -16,7 +16,7 @@ import {
   ForgedBlockDefinition,
   ForgedBlock,
 } from '@typebot.io/forge-repository/types'
-import { ReactNode, useMemo } from 'react'
+import { ReactNode, useEffect, useMemo, useRef } from 'react'
 
 type Props = {
   blockDef: ForgedBlockDefinition
@@ -61,6 +61,25 @@ export const ForgeSelectInput = ({
     const fetchers = blockDef.actions.flatMap((action) => action.fetchers ?? [])
     return fetchers.find((fetcher) => fetcher.id === fetcherId)
   }, [baseFetcher, blockDef.actions, fetcherId])
+
+  const depValues = useMemo(() => {
+    const deps = (baseFetcher?.dependencies ??
+      actionFetcher?.dependencies ??
+      []) as string[]
+    return deps.map((k) => (options as Record<string, unknown>)?.[k])
+  }, [baseFetcher, actionFetcher, options])
+
+  const depValuesKey = JSON.stringify(depValues)
+  const prevDepValuesKeyRef = useRef(depValuesKey)
+
+  useEffect(() => {
+    if (prevDepValuesKeyRef.current !== depValuesKey) {
+      prevDepValuesKeyRef.current = depValuesKey
+      if (defaultValue !== undefined) {
+        onChange(undefined)
+      }
+    }
+  }, [depValuesKey])
 
   const { data } = trpc.forge.fetchSelectItems.useQuery(
     {
