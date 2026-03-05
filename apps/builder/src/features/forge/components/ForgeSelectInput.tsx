@@ -118,8 +118,6 @@ export const ForgeSelectInput = ({
     }
   )
 
-  console.log(selectInput)
-
   return (
     <FormControl
       isRequired={isRequired}
@@ -143,7 +141,8 @@ export const ForgeSelectInput = ({
           onSelect={onChange}
           placeholder={placeholder}
           onInputChange={(value) => {
-            if (selectInput?.current?.search) selectInput.current.search = value
+            if (selectInput && 'search' in selectInput.current)
+              selectInput.current.search = value
           }}
         />
         {withVariableButton ? (
