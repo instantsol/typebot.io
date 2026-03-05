@@ -18,6 +18,10 @@ import {
 } from '@typebot.io/forge-repository/types'
 import { ReactNode, useEffect, useMemo, useRef } from 'react'
 
+type SearchRef = {
+  search: string
+}
+
 type Props = {
   blockDef: ForgedBlockDefinition
   defaultValue?: string
@@ -51,6 +55,8 @@ export const ForgeSelectInput = ({
   const { workspace } = useWorkspace()
   const { showToast } = useToast()
 
+  const selectInput = useRef<SearchRef>({ search: '' })
+
   const baseFetcher = useMemo(() => {
     const fetchers = blockDef.fetchers ?? []
     return fetchers.find((fetcher) => fetcher.id === fetcherId)
@@ -81,10 +87,17 @@ export const ForgeSelectInput = ({
     }
   }, [depValuesKey])
 
+  const newOptions = {
+    ...options,
+  }
+
+  if (selectInput?.current?.search)
+    newOptions.search = selectInput?.current?.search || ''
+
   const { data } = trpc.forge.fetchSelectItems.useQuery(
     {
       integrationId: blockDef.id,
-      options: pick(options, [
+      options: pick(newOptions, [
         ...(actionFetcher ? ['action'] : []),
         ...(blockDef.auth ? ['credentialsId'] : []),
         ...((baseFetcher
@@ -104,6 +117,8 @@ export const ForgeSelectInput = ({
       },
     }
   )
+
+  console.log(selectInput)
 
   return (
     <FormControl
@@ -127,6 +142,9 @@ export const ForgeSelectInput = ({
           selectedItem={defaultValue}
           onSelect={onChange}
           placeholder={placeholder}
+          onInputChange={(value) => {
+            if (selectInput?.current?.search) selectInput.current.search = value
+          }}
         />
         {withVariableButton ? (
           <VariablesButton
