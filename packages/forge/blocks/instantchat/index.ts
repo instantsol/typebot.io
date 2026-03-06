@@ -9,6 +9,12 @@ import { wppNotify } from './actions/wppNotify'
 import { intent } from './actions/intent'
 import { updateContact } from './actions/updateContact'
 import { baseOptions } from './baseOptions'
+import { getContact } from './actions/getContact'
+import {
+  deprecatedQueueJoin,
+  deprecatedCheckTime,
+  deprecatedOportunidade,
+} from './actions/deprecated'
 
 export const instantchatBlock = createBlock({
   id: 'instantchat' as const,
@@ -16,5 +22,17 @@ export const instantchatBlock = createBlock({
   tags: [],
   LightLogo: InstantchatLogo,
   auth,
-  actions: [queueJoin, checkTime, cortex, chat, wppNotify, intent, updateContact],
+  actions: [
+    queueJoin,
+    checkTime,
+    cortex,
+    chat,
+    wppNotify,
+    intent,
+    updateContact,
+    getContact,
+    deprecatedQueueJoin,
+    deprecatedCheckTime,
+    deprecatedOportunidade,
+  ],
 })
