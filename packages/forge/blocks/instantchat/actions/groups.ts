@@ -8,10 +8,6 @@ export const groups = createAction({
   name: 'Segmentar',
   baseOptions,
   options: option.object({
-  search: option.string.layout({
-    label: 'Busca',
-    isHidden: true
-  }),
     group: option.string.layout({
       label: 'Segmento',
       fetcher: 'fetchGroups',

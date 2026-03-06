@@ -16,11 +16,9 @@ import {
   ForgedBlockDefinition,
   ForgedBlock,
 } from '@typebot.io/forge-repository/types'
-import { ReactNode, useEffect, useMemo, useRef } from 'react'
+import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 
-type SearchRef = {
-  search: string
-}
+let timeout: ReturnType<typeof setTimeout> = setTimeout(() => {}, 1)
 
 type Props = {
   blockDef: ForgedBlockDefinition
@@ -54,8 +52,7 @@ export const ForgeSelectInput = ({
 }: Props) => {
   const { workspace } = useWorkspace()
   const { showToast } = useToast()
-
-  const selectInput = useRef<SearchRef>({ search: '' })
+  const [search, setSearch] = useState('')
 
   const baseFetcher = useMemo(() => {
     const fetchers = blockDef.fetchers ?? []
@@ -91,8 +88,8 @@ export const ForgeSelectInput = ({
     ...options,
   }
 
-  if (selectInput?.current?.search)
-    newOptions.search = selectInput?.current?.search || ''
+  if (search) newOptions.search = search
+  else newOptions.group_id = defaultValue
 
   const { data } = trpc.forge.fetchSelectItems.useQuery(
     {
@@ -141,8 +138,8 @@ export const ForgeSelectInput = ({
           onSelect={onChange}
           placeholder={placeholder}
           onInputChange={(value) => {
-            if (selectInput && 'search' in selectInput.current)
-              selectInput.current.search = value
+            clearTimeout(timeout)
+            timeout = setTimeout(() => setSearch(value), 500)
           }}
         />
         {withVariableButton ? (
