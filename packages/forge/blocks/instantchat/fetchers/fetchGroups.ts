@@ -7,12 +7,12 @@ type group = {
 
 export const fetchGroups: FetcherDefinition<AuthDefinition, any> = {
   id: 'fetchGroups',
-  dependencies: ['search', 'group_id'],
+  dependencies: ['search', 'selectedValue'],
   fetch: async ({ credentials, options }) => {
     const { baseUrl, kwikToken } = credentials || {}
-    const { search, group_id, group } = options || {}
+    const { search, selectedValue } = options || {}
 
-    const apiUrl = `${baseUrl}/api/api/public/v1/groups/?search=${search || ''}&group=${group_id || 0}`
+    const apiUrl = `${baseUrl}/api/api/public/v1/groups/?search=${search || ''}&group=${selectedValue || 0}`
     const apiResponse = await fetch(apiUrl, {
       method: 'GET',
       headers: {

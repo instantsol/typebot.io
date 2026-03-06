@@ -89,7 +89,7 @@ export const ForgeSelectInput = ({
   }
 
   if (search) newOptions.search = search
-  else newOptions.group_id = defaultValue
+  else newOptions.selectedValue = defaultValue
 
   const { data } = trpc.forge.fetchSelectItems.useQuery(
     {
@@ -139,7 +139,7 @@ export const ForgeSelectInput = ({
           placeholder={placeholder}
           onInputChange={(value) => {
             clearTimeout(timeout)
-            timeout = setTimeout(() => setSearch(value), 500)
+            timeout = setTimeout(() => setSearch(value), 1000)
           }}
         />
         {withVariableButton ? (
