@@ -5,6 +5,7 @@ import { fetchJourneys } from '../fetchers/fetchJourneys'
 import { fetchColumns } from '../fetchers/fetchColumns'
 import { fetchSellers } from '../fetchers/fetchSellers'
 import { fetchJourneyTags } from '../fetchers/fetchJourneyTags'
+import { fetchEnterprises } from '../fetchers/fetchEnterprises'
 import { auth } from '../auth'
 
 export const opportunity = createAction({
@@ -44,6 +45,15 @@ export const opportunity = createAction({
       label: 'Outros Contatos',
       withVariableButton: true,
     }),
+    contact: option.string.layout({
+      label: 'Contato',
+      withVariableButton: true,
+      moreInfoTooltip: 'Informe o nome do contato (ou variável). Não envie o ID.',
+    }),
+    enterprise: option.string.layout({
+      label: 'Empresa',
+      fetcher: 'fetchEnterprises',
+    }),
     tag: option.string.layout({
       label: 'Marcador',
       fetcher: 'fetchJourneyTags',
@@ -51,7 +61,7 @@ export const opportunity = createAction({
   }),
   run: {
     server: async ({
-      options: { journey, column, title, description, currency, value, seller, otherContacts, tag },
+      options: { journey, column, title, description, currency, value, seller, otherContacts, tag, contact, enterprise },
       variables,
       credentials,
     }) => {
@@ -89,6 +99,8 @@ export const opportunity = createAction({
           value         : parsedValue,
           seller        : seller,
           otherContacts : otherContacts,
+          contact       : contact,
+          enterprise_name: enterprise,
           tag           : tag,
         })
       })
@@ -101,5 +113,5 @@ export const opportunity = createAction({
       }
     },
   },
-  fetchers: [fetchJourneys, fetchColumns, fetchJourneyTags, fetchSellers],
+  fetchers: [fetchJourneys, fetchColumns, fetchJourneyTags, fetchSellers, fetchEnterprises],
 })
