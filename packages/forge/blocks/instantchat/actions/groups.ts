@@ -12,10 +12,16 @@ export const groups = createAction({
       label: 'Segmento',
       fetcher: 'fetchGroups',
     }),
+    contact: option.string.layout({
+      accordion: 'Avançado',
+      label: 'Id do contato',
+      isRequired: false,
+      withVariableButton: true,
+    }),
   }),
   run: {
     server: async ({
-      options: { group },
+      options: { group,  contact },
       variables,
       credentials,
     }) => {
@@ -26,7 +32,7 @@ export const groups = createAction({
       const id_cliente = variables
         .list()
         .find((v) => v.name === 'is_clientid')?.value
-      const url = `${baseUrl}/ivci/webhook/group_chat?group=${group}&page_id=${id_chatbot}&sender_id=${id_cliente}`
+      const url = `${baseUrl}/ivci/webhook/group_chat?group=${group}&page_id=${id_chatbot}&sender_id=${id_cliente}&contact=${contact || ''}`
       const response = await fetch(url, { method: 'POST' })
       if (response.status < 300 && response.status >= 200) {
         const res = await response.json()
