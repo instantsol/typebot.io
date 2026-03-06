@@ -46,13 +46,14 @@ export const opportunity = createAction({
       withVariableButton: true,
     }),
     contact: option.string.layout({
-      label: 'Contato',
+      label: 'Contato (ID)',
       withVariableButton: true,
-      moreInfoTooltip: 'Informe o nome do contato (ou variável). Não envie o ID.',
+      moreInfoTooltip: 'Digite o ID numérico do contato ou use uma variável. O sistema não tentará resolver nomes.',
     }),
     enterprise: option.string.layout({
-      label: 'Empresa',
+      label: 'Empresa (ID)',
       fetcher: 'fetchEnterprises',
+      moreInfoTooltip: 'Informe o ID da empresa ou use uma variável. Somente valores numéricos são aceitos.',
     }),
     tag: option.string.layout({
       label: 'Marcador',
@@ -100,7 +101,7 @@ export const opportunity = createAction({
           seller        : seller,
           otherContacts : otherContacts,
           contact       : contact,
-          enterprise_name: enterprise,
+          enterprise      : enterprise,
           tag           : tag,
         })
       })
