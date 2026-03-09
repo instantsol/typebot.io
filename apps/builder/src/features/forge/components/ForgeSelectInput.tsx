@@ -16,7 +16,9 @@ import {
   ForgedBlockDefinition,
   ForgedBlock,
 } from '@typebot.io/forge-repository/types'
-import { ReactNode, useEffect, useMemo, useRef } from 'react'
+import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+
+let timeout: ReturnType<typeof setTimeout> = setTimeout(() => {}, 1)
 
 type Props = {
   blockDef: ForgedBlockDefinition
@@ -50,6 +52,7 @@ export const ForgeSelectInput = ({
 }: Props) => {
   const { workspace } = useWorkspace()
   const { showToast } = useToast()
+  const [search, setSearch] = useState('')
 
   const baseFetcher = useMemo(() => {
     const fetchers = blockDef.fetchers ?? []
@@ -81,10 +84,17 @@ export const ForgeSelectInput = ({
     }
   }, [depValuesKey])
 
+  const newOptions = {
+    ...options,
+  }
+
+  if (search) newOptions.search = search
+  else newOptions.selectedValue = defaultValue
+
   const { data } = trpc.forge.fetchSelectItems.useQuery(
     {
       integrationId: blockDef.id,
-      options: pick(options, [
+      options: pick(newOptions, [
         ...(actionFetcher ? ['action'] : []),
         ...(blockDef.auth ? ['credentialsId'] : []),
         ...((baseFetcher
@@ -127,6 +137,10 @@ export const ForgeSelectInput = ({
           selectedItem={defaultValue}
           onSelect={onChange}
           placeholder={placeholder}
+          onInputChange={(value) => {
+            clearTimeout(timeout)
+            timeout = setTimeout(() => setSearch(value), 1000)
+          }}
         />
         {withVariableButton ? (
           <VariablesButton

@@ -10,6 +10,7 @@ import { intent } from './actions/intent'
 import { updateContact } from './actions/updateContact'
 import { aiAgent } from './actions/aiAgent'
 import { tag } from './actions/tag'
+import { groups } from './actions/groups'
 import { watcher } from './actions/watcher'
 import { opportunity } from './actions/opportunity'
 import { baseOptions } from './baseOptions'
@@ -34,5 +35,6 @@ export const instantchatBlock = createBlock({
     watcher,
     opportunity,
     getContact,
+    groups
   ],
 })

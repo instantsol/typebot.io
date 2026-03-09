@@ -37,6 +37,7 @@ type Props<T extends Item> = {
   items: readonly T[] | undefined
   placeholder?: string
   onSelect?: (value: string | undefined, item?: T) => void
+  onInputChange?: (value: string) => void
 }
 
 export const Select = <T extends Item>({
@@ -44,6 +45,7 @@ export const Select = <T extends Item>({
   placeholder,
   items,
   onSelect,
+  onInputChange = () => {},
 }: Props<T>) => {
   const focusedItemBgColor = useColorModeValue('gray.200', 'gray.700')
   const selectedItemBgColor = useColorModeValue('blue.50', 'blue.400')
@@ -109,6 +111,7 @@ export const Select = <T extends Item>({
     if (!isOpen) onOpen()
     if (!isTouched) setIsTouched(true)
     setInputValue(e.target.value)
+    onInputChange(e.target.value)
   }
 
   const handleItemClick = (item: T) => () => {
