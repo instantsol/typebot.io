@@ -14,6 +14,7 @@ import { groups } from './actions/groups'
 import { watcher } from './actions/watcher'
 import { opportunity } from './actions/opportunity'
 import { baseOptions } from './baseOptions'
+import { getContact } from './actions/getContact'
 
 export const instantchatBlock = createBlock({
   id: 'instantchat' as const,
@@ -33,6 +34,7 @@ export const instantchatBlock = createBlock({
     tag,
     watcher,
     opportunity,
+    getContact,
     groups
   ],
 })
