@@ -48,12 +48,14 @@ export const opportunity = createAction({
     contact: option.string.layout({
       label: 'Contato (ID)',
       withVariableButton: true,
-      moreInfoTooltip: 'Digite o ID numérico do contato ou use uma variável. O sistema não tentará resolver nomes.',
+      moreInfoTooltip:
+        'Digite o ID numérico do contato ou use uma variável. O sistema não tentará resolver nomes.',
     }),
     enterprise: option.string.layout({
       label: 'Empresa (ID)',
       fetcher: 'fetchEnterprises',
-      moreInfoTooltip: 'Informe o ID da empresa ou use uma variável. Somente valores numéricos são aceitos.',
+      moreInfoTooltip:
+        'Informe o ID da empresa ou use uma variável. Somente valores numéricos são aceitos.',
     }),
     tag: option.string.layout({
       label: 'Marcador',
@@ -62,7 +64,19 @@ export const opportunity = createAction({
   }),
   run: {
     server: async ({
-      options: { journey, column, title, description, currency, value, seller, otherContacts, tag, contact, enterprise },
+      options: {
+        journey,
+        column,
+        title,
+        description,
+        currency,
+        value,
+        seller,
+        otherContacts,
+        tag,
+        contact,
+        enterprise,
+      },
       variables,
       credentials,
     }) => {
@@ -81,29 +95,31 @@ export const opportunity = createAction({
             : value
         const num = Number(normalized)
         if (Number.isNaN(num)) {
-          throw new Error('Valor inválido')
+          console.error(`Value ${value} is not a number.`)
+          parsedValue = 0
+        } else {
+          parsedValue = num
         }
-        parsedValue = num
       }
       const url = `${baseUrl}/ivci/webhook/create_opportunity?page_id=${id_chatbot}&sender_id=${id_cliente}`
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          journey       : journey,
-          column        : column,
-          title         : title,
-          description   : description,
-          currency      : currency,
-          value         : parsedValue,
-          seller        : seller,
-          otherContacts : otherContacts,
-          contact       : contact,
-          enterprise      : enterprise,
-          tag           : tag,
-        })
+          journey: journey,
+          column: column,
+          title: title,
+          description: description,
+          currency: currency,
+          value: parsedValue,
+          seller: seller,
+          otherContacts: otherContacts,
+          contact: contact,
+          enterprise: enterprise,
+          tag: tag,
+        }),
       })
       if (response.status < 300 && response.status >= 200) {
         const res = await response.json()
@@ -114,5 +130,11 @@ export const opportunity = createAction({
       }
     },
   },
-  fetchers: [fetchJourneys, fetchColumns, fetchJourneyTags, fetchSellers, fetchEnterprises],
+  fetchers: [
+    fetchJourneys,
+    fetchColumns,
+    fetchJourneyTags,
+    fetchSellers,
+    fetchEnterprises,
+  ],
 })
