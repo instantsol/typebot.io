@@ -6,51 +6,71 @@ export const updateContact = createAction({
   name: 'Atualizar Contato',
   options: option.object({
     internal_code: option.string.layout({
-      label: 'Código Interno (KID)'
+      label: 'Código Interno (KID)',
     }),
     name: option.string.layout({
-      label: 'Nome'
+      label: 'Nome',
     }),
     telephone: option.string.layout({
-      label: 'Telefone'
+      label: 'Telefone',
     }),
     email: option.string.layout({
-      label: 'E-mail'
+      label: 'E-mail',
     }),
     enterprise_name: option.string.layout({
-      label: 'Empresa'
+      label: 'Empresa',
     }),
     cpf: option.string.layout({
-      label: 'CPF'
+      label: 'CPF',
     }),
     customer_code: option.string.layout({
-      label: 'Código'
-    })
+      label: 'Código',
+    }),
+    automation_mode: option.boolean.layout({
+      label: 'Modo Automação',
+      moreInfoTooltip:
+        'Não utiliza o canal relativo a este atendimento para decidir nada.',
+      defaultValue: false,
+    }),
   }),
   run: {
     server: async ({
-      options: { internal_code, name, telephone, email, enterprise_name, cpf, customer_code },
+      options: {
+        internal_code,
+        name,
+        telephone,
+        email,
+        enterprise_name,
+        cpf,
+        customer_code,
+        automation_mode,
+      },
       variables,
       credentials,
     }) => {
       const { baseUrl } = credentials
-      const response = await fetch(`${baseUrl}/ivci/webhook/update_contact`, { 
-        method: 'POST', 
+      const response = await fetch(`${baseUrl}/ivci/webhook/update_contact`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          platform        : variables.list().find((v) => v.name === 'is_platform')?.value,
-          client_id       : variables.list().find((v) => v.name === 'is_clientid')?.value,
-          accountcode     : variables.list().find((v) => v.name === 'is_accountcode')?.value,
-          unique_id       : variables.list().find((v) => v.name === 'is_uniqueid')?.value,
-          internal_code   : internal_code,
-          name            : name,
-          telephone       : telephone,
-          email           : email,
-          enterprise_name : enterprise_name,
-          cpf             : cpf,
-          customer_code   : customer_code,
-        })
+          platform: variables.list().find((v) => v.name === 'is_platform')
+            ?.value,
+          client_id: variables.list().find((v) => v.name === 'is_clientid')
+            ?.value,
+          accountcode: variables.list().find((v) => v.name === 'is_accountcode')
+            ?.value,
+          unique_id: variables.list().find((v) => v.name === 'is_uniqueid')
+            ?.value,
+          internal_code: internal_code,
+          name: name,
+          telephone: telephone,
+          email: email,
+          enterprise_name: enterprise_name,
+          cpf: cpf,
+          customer_code: customer_code,
+          automation_mode: automation_mode,
+        }),
       })
     },
-  }
+  },
 })
