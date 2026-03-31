@@ -61,6 +61,11 @@ export const opportunity = createAction({
       label: 'Marcador',
       fetcher: 'fetchJourneyTags',
     }),
+    responseMapping: option
+      .saveResponseArray(['Identificador'] as const)
+      .layout({
+        accordion: 'Salvar resultado',
+      }),
   }),
   run: {
     server: async ({
@@ -76,6 +81,7 @@ export const opportunity = createAction({
         tag,
         contact,
         enterprise,
+        responseMapping,
       },
       variables,
       credentials,
@@ -123,6 +129,10 @@ export const opportunity = createAction({
       })
       if (response.status < 300 && response.status >= 200) {
         const res = await response.json()
+        responseMapping?.forEach((r) => {
+          if (!r.variableId) return
+          variables.set(r.variableId, res.id)
+        })
       } else {
         console.error(
           `Error calling create opportunity [${journey}] -> ${response.status}: ${response.statusText}`

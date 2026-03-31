@@ -32,6 +32,11 @@ export const updateContact = createAction({
         'Não utiliza o canal relativo a este atendimento para decidir nada.',
       defaultValue: false,
     }),
+    responseMapping: option
+      .saveResponseArray(['Identificador'] as const)
+      .layout({
+        accordion: 'Salvar resultado',
+      }),
   }),
   run: {
     server: async ({
@@ -44,6 +49,7 @@ export const updateContact = createAction({
         cpf,
         customer_code,
         automation_mode,
+        responseMapping,
       },
       variables,
       credentials,
@@ -71,6 +77,13 @@ export const updateContact = createAction({
           automation_mode: automation_mode,
         }),
       })
+      if (response.status < 300 && response.status >= 200) {
+        const res = await response.json()
+        responseMapping?.forEach((r) => {
+          if (!r.variableId) return
+          variables.set(r.variableId, res.id)
+        })
+      }
     },
   },
 })
