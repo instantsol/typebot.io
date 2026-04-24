@@ -57,7 +57,7 @@ export const aiAgent = createAction({
       displayEmbedBubble: {
         parseUrl: ({}) => '',
         waitForEvent: {
-          getSaveVariableId: ({ responseMapping }) => responseMapping,
+          getSaveVariableId: () => undefined,
           parseFunction: () => {
             return {
               args: {},
