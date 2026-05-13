@@ -20,6 +20,27 @@ import { byId } from '@typebot.io/lib'
 import { BubbleBlockType } from '@typebot.io/schemas/features/blocks/bubbles/constants'
 import { getCredentials } from '../queries/getCredentials'
 
+const getKwikVariableValue = (
+  typebot: TypebotInSession,
+  names: string[]
+): string | undefined => {
+  for (const name of names) {
+    const value = typebot.variables.find(
+      (variable) => variable.name === name
+    )?.value
+
+    if (value === undefined || value === null || value === '') continue
+
+    return String(value)
+  }
+}
+
+const getKwikPlatform = (typebot: TypebotInSession): string | undefined =>
+  getKwikVariableValue(typebot, ['is_platform', 'platform'])
+
+const isKwikWatcherSupportedPlatform = (platform?: string): boolean =>
+  !platform || platform.toUpperCase() === 'INSTANTCHAT'
+
 export const executeForgedBlock = async (
   state: SessionState,
   block: ForgedBlock
@@ -27,6 +48,9 @@ export const executeForgedBlock = async (
   const blockDef = forgedBlocks[block.type]
   if (!blockDef) return { outgoingEdgeId: block.outgoingEdgeId }
   const action = blockDef.actions.find((a) => a.name === block.options.action)
+  const isKwikWatcherBlock =
+    block.type === 'instantchat' && action?.name === 'Watcher'
+
   const noCredentialsError = {
     status: 'error',
     description: 'Credentials not provided for integration',
@@ -141,12 +165,18 @@ export const executeForgedBlock = async (
     })
   }
 
+  const kwikPlatform = isKwikWatcherBlock ? getKwikPlatform(typebot) : undefined
+  const shouldSkipKwikWatcherCustomEmbed =
+    isKwikWatcherBlock && !isKwikWatcherSupportedPlatform(kwikPlatform)
+
   return {
     newSessionState,
     outgoingEdgeId: block.outgoingEdgeId,
     logs,
     clientSideActions,
-    customEmbedBubble: action?.run?.web?.displayEmbedBubble
+    customEmbedBubble:
+      action?.run?.web?.displayEmbedBubble &&
+      !shouldSkipKwikWatcherCustomEmbed
       ? {
           type: 'custom-embed',
           content: {
