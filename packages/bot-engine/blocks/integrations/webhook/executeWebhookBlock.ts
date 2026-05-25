@@ -203,6 +203,7 @@ export const executeWebhook = async (
     method,
     headers: headers ?? {},
     ...(basicAuth ?? {}),
+    retry: 0,
     timeout: isNotDefined(env.CHAT_API_TIMEOUT)
       ? false
       : params.timeout && params.timeout !== defaultTimeout
