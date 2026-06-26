@@ -9,6 +9,8 @@ import { createSession } from './queries/createSession'
 import { deleteSession } from './queries/deleteSession'
 import { Prisma, VisitedEdge } from '@typebot.io/prisma'
 import prisma from '@typebot.io/lib/prisma'
+import { saveLogs } from './queries/saveLogs'
+import { formatLogDetails } from './logs/helpers/formatLogDetails'
 
 type Props = {
   session: Pick<ChatSession, 'state'> & { id?: string }
@@ -77,6 +79,16 @@ export const saveStateToDatabase = async ({
   )
 
   await prisma.$transaction(queries)
+
+  const errorLogs = logs?.filter((log) => log.status === 'error')
+  if (errorLogs && errorLogs.length > 0)
+    await saveLogs(
+      errorLogs.map((log) => ({
+        ...log,
+        resultId,
+        details: formatLogDetails(log.details),
+      }))
+    )
 
   return session
 }

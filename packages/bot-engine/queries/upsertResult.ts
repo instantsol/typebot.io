@@ -27,14 +27,18 @@ export const upsertResult = ({
   const variablesWithValue = filterNonSessionVariablesWithValues(
     typebot.variables
   )
+  const logsToCreateData = logs
+    ?.filter((log) => log.status !== 'error')
+    .map((log) => ({
+      ...log,
+      details: formatLogDetails(log.details),
+    }))
+
   const logsToCreate =
-    logs && logs.length > 0
+    logsToCreateData && logsToCreateData.length > 0
       ? {
           createMany: {
-            data: logs.map((log) => ({
-              ...log,
-              details: formatLogDetails(log.details),
-            })),
+            data: logsToCreateData,
             skipDuplicates: true,
           },
         }
