@@ -27,10 +27,16 @@ export const flows = createAction({
       withVariableButton: true,
       defaultValue: 'Abrir',
     }),
+    api: option.boolean.layout({
+      label: 'Gerenciado via API?',
+      moreInfoTooltip:
+        'Indica se o flows escolhido é gerenciado via API, ou somente navegação.',
+      defaultValue: true,
+    }),
   }),
   run: {
     server: async ({
-      options: { flows, header = "Cabeçalho", content = "Conteúdo", cta = "Abrir" },
+      options: { flows, header = "Cabeçalho", content = "Conteúdo", cta = "Abrir", api = true },
       variables,
       credentials,
     }) => {
@@ -50,7 +56,7 @@ export const flows = createAction({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ header, content, cta }),
+        body: JSON.stringify({ header, content, cta, api }),
       })
       if (response.status < 300 && response.status >= 200) {
         const res = await response.json()
