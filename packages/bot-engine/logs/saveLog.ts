@@ -1,7 +1,7 @@
 import prisma from '@typebot.io/lib/prisma'
 import { formatLogDetails } from './helpers/formatLogDetails'
 
-const notifyTypebotErrorLog = (log: {
+const notifyTypebotErrorLog = async (log: {
   id: string
   createdAt: Date
   resultId: string
@@ -9,6 +9,19 @@ const notifyTypebotErrorLog = (log: {
   description: string
   details: string | null
 }) => {
+  let typebotId: string | null = null
+  let typebotName: string | null = null
+  try {
+    const result = await prisma.result.findUnique({
+      where: { id: log.resultId },
+      select: { typebot: { select: { id: true, name: true } } },
+    })
+    typebotId = result?.typebot?.id ?? null
+    typebotName = result?.typebot?.name ?? null
+  } catch (err) {
+    console.warn('Failed to fetch typebot info for error log:', err)
+  }
+
   fetch('http://ivci:9000/webhook/typebot_error_log', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -16,6 +29,8 @@ const notifyTypebotErrorLog = (log: {
       logId: log.id,
       createdAt: log.createdAt.toISOString(),
       resultId: log.resultId,
+      typebotId,
+      typebotName,
       status: log.status,
       description: log.description,
       details: log.details,
@@ -50,7 +65,13 @@ export const saveLog = async ({
     },
   })
 
-  if (status === 'error') notifyTypebotErrorLog(log)
+  if (status === 'error') {
+    try {
+      const parsed = log.details ? JSON.parse(log.details) : null
+      if (parsed?.response?.statusCode === 404) return log
+    } catch {}
+    notifyTypebotErrorLog(log).catch(() => {})
+  }
 
   return log
 }
