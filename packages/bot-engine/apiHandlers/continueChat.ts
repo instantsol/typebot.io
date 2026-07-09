@@ -8,6 +8,11 @@ import { saveStateToDatabase } from '../saveStateToDatabase'
 import { computeCurrentProgress } from '../computeCurrentProgress'
 import { BubbleBlockType } from '@typebot.io/schemas/features/blocks/bubbles/constants'
 import { Message } from '@typebot.io/schemas'
+import { deleteSession } from '../queries/deleteSession'
+import {
+  ERROR_LOOP_FORCED_STOP_MESSAGE,
+  isResultStoppedByErrorLoop,
+} from '../logs/errorLoopGuard'
 
 type Props = {
   origin: string | undefined
@@ -40,6 +45,15 @@ export const continueChat = async ({
       code: 'NOT_FOUND',
       message: 'Session expired. You need to start a new session.',
     })
+
+  const resultId = session.state.typebotsQueue[0].resultId
+  if (resultId && (await isResultStoppedByErrorLoop(resultId))) {
+    await deleteSession(session.id)
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `${ERROR_LOOP_FORCED_STOP_MESSAGE}. Start a new result to run this bot again.`,
+    })
+  }
 
   let corsOrigin
 

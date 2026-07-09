@@ -50,6 +50,10 @@ import {
 import { BubbleBlockType } from '@typebot.io/schemas/features/blocks/bubbles/constants'
 import { LogicBlockType } from '@typebot.io/schemas/features/blocks/logic/constants'
 import { parseVariablesInRichText } from './parseBubbleBlock'
+import {
+  ERROR_LOOP_FORCED_STOP_MESSAGE,
+  isResultStoppedByErrorLoop,
+} from './logs/errorLoopGuard'
 
 type StartParams =
   | ({
@@ -80,12 +84,9 @@ export const startSession = async ({
 > => {
   const typebot = await getTypebot(startParams)
 
-  const prefilledVariables =
-    //startParams.type === 'live' && startParams.prefilledVariables
-    startParams.prefilledVariables
-      // ? prefillVariables(typebot.variables, startParams.prefilledVariables)
-      ? prefillAddVariables(typebot.variables, startParams.prefilledVariables)
-      : typebot.variables
+  const prefilledVariables = startParams.prefilledVariables
+    ? prefillAddVariables(typebot.variables, startParams.prefilledVariables)
+    : typebot.variables
 
   const result = await getResult({
     resultId: startParams.type === 'live' ? startParams.resultId : undefined,
@@ -380,6 +381,16 @@ const getResult = async ({
   isRememberUserEnabled: boolean
 }) => {
   if (isPreview) return
+  if (
+    resultId &&
+    isRememberUserEnabled &&
+    (await isResultStoppedByErrorLoop(resultId))
+  )
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `${ERROR_LOOP_FORCED_STOP_MESSAGE}. Start a new result to run this bot again.`,
+    })
+
   const existingResult =
     resultId && isRememberUserEnabled
       ? await findResult({ id: resultId })

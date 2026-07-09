@@ -34,7 +34,8 @@ export const saveClientLogs = async ({ sessionId, clientLogs }: Props) => {
         ...log,
         resultId,
         details: formatLogDetails(log.details),
-      }))
+      })),
+      { sessionId }
     )
     return {
       message: 'Logs successfully saved.',
