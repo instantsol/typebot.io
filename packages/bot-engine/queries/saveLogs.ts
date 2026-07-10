@@ -2,7 +2,10 @@ import prisma from '@typebot.io/lib/prisma'
 import { Log } from '@typebot.io/schemas'
 import { saveLog } from '../logs/saveLog'
 
-export const saveLogs = async (logs: Omit<Log, 'id' | 'createdAt'>[]) => {
+export const saveLogs = async (
+  logs: Omit<Log, 'id' | 'createdAt'>[],
+  { sessionId }: { sessionId?: string } = {}
+) => {
   const errorLogs = logs.filter((log) => log.status === 'error')
   const otherLogs = logs.filter((log) => log.status !== 'error')
 
@@ -13,6 +16,7 @@ export const saveLogs = async (logs: Omit<Log, 'id' | 'createdAt'>[]) => {
     ...errorLogs.map((log) =>
       saveLog({
         resultId: log.resultId,
+        sessionId,
         status: 'error',
         message: log.description,
         formattedDetails: log.details ?? null,

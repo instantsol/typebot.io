@@ -1,5 +1,9 @@
 import prisma from '@typebot.io/lib/prisma'
 import { formatLogDetails } from './helpers/formatLogDetails'
+import {
+  enforceErrorLoopLimit,
+  isResultStoppedByErrorLoop,
+} from './errorLoopGuard'
 
 const notifyTypebotErrorLog = async (log: {
   id: string
@@ -43,6 +47,7 @@ const notifyTypebotErrorLog = async (log: {
 type Props = {
   status: 'error' | 'success' | 'info'
   resultId: string | undefined
+  sessionId?: string
   message: string
   details?: unknown
   formattedDetails?: string | null
@@ -51,11 +56,17 @@ type Props = {
 export const saveLog = async ({
   status,
   resultId,
+  sessionId,
   message,
   details,
   formattedDetails,
 }: Props) => {
   if (!resultId || resultId === 'undefined') return
+  if (status === 'error' && (await isResultStoppedByErrorLoop(resultId))) {
+    await enforceErrorLoopLimit({ resultId, sessionId })
+    return
+  }
+
   const log = await prisma.log.create({
     data: {
       resultId,
@@ -66,12 +77,28 @@ export const saveLog = async ({
   })
 
   if (status === 'error') {
-    try {
-      const parsed = log.details ? JSON.parse(log.details) : null
-      if (parsed?.response?.statusCode === 404) return log
-    } catch {}
+    const shouldSkipNotification = shouldSkipErrorLogNotification(log)
+    const enforcement = await enforceErrorLoopLimit({ resultId, sessionId })
+    if (enforcement.status === 'stopped') {
+      notifyTypebotErrorLog(enforcement.stopLog).catch(() => {})
+      return log
+    }
+    if (enforcement.status === 'alreadyStopped') return log
+    if (shouldSkipNotification) return log
+
     notifyTypebotErrorLog(log).catch(() => {})
   }
 
   return log
+}
+
+const shouldSkipErrorLogNotification = (log: { details: string | null }) => {
+  if (!log.details) return false
+
+  try {
+    const parsed = JSON.parse(log.details)
+    if (parsed?.response?.statusCode === 404) return true
+  } catch {}
+
+  return false
 }

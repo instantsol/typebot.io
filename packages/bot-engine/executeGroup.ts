@@ -33,6 +33,7 @@ import {
   parseBubbleBlock,
 } from './parseBubbleBlock'
 import { BubbleBlockType } from '@typebot.io/schemas/features/blocks/bubbles/constants'
+import { ERROR_LOOP_LIMIT_PER_MINUTE } from './logs/errorLoopGuard'
 
 type ContextProps = {
   version: 1 | 2
@@ -174,8 +175,18 @@ export const executeGroup = async (
       executionResponse.startTimeShouldBeUpdated
     )
       newStartTime = Date.now()
-    if (executionResponse.logs)
+    if (executionResponse.logs) {
       logs = [...(logs ?? []), ...executionResponse.logs]
+      if (hasExceededCurrentRunErrorLimit(logs))
+        return {
+          messages,
+          newSessionState,
+          clientSideActions,
+          logs,
+          visitedEdges,
+          setVariableHistory,
+        }
+    }
     if (executionResponse.newSessionState)
       newSessionState = executionResponse.newSessionState
     if (
@@ -273,6 +284,10 @@ export const executeGroup = async (
     textBubbleContentFormat,
   })
 }
+
+const hasExceededCurrentRunErrorLimit = (logs: ContinueChatResponse['logs']) =>
+  (logs?.filter((log) => log.status === 'error').length ?? 0) >
+  ERROR_LOOP_LIMIT_PER_MINUTE
 
 const computeRuntimeOptions =
   (state: SessionState) =>

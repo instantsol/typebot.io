@@ -87,7 +87,8 @@ export const saveStateToDatabase = async ({
         ...log,
         resultId,
         details: formatLogDetails(log.details),
-      }))
+      })),
+      { sessionId: session.id }
     )
 
   return session
