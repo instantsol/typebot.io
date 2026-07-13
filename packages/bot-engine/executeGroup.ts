@@ -34,6 +34,15 @@ import {
 } from './parseBubbleBlock'
 import { BubbleBlockType } from '@typebot.io/schemas/features/blocks/bubbles/constants'
 import { ERROR_LOOP_LIMIT_PER_MINUTE } from './logs/errorLoopGuard'
+import { RUNTIME_TIMEOUT_FORCED_STOP_MESSAGE } from './logs/runtimeTimeoutGuard'
+
+const CURRENT_RUN_WEBHOOK_TIMEOUT_LIMIT = 10
+const CONSECUTIVE_ERROR_LIMIT = 10
+const WEBHOOK_TIMEOUT_DESCRIPTION_PREFIX = 'Webhook request timed out.'
+const WEBHOOK_TIMEOUT_LOOP_FORCED_STOP_MESSAGE =
+  'Bot stopped automatically: webhook timeout loop detected'
+const CONSECUTIVE_ERROR_LOOP_FORCED_STOP_MESSAGE =
+  'Bot stopped automatically: consecutive error loop detected'
 
 type ContextProps = {
   version: 1 | 2
@@ -86,9 +95,19 @@ export const executeGroup = async (
       env.CHAT_API_TIMEOUT &&
       Date.now() - newStartTime > env.CHAT_API_TIMEOUT
     ) {
-      throw new TRPCError({
-        code: 'TIMEOUT',
-        message: `${env.CHAT_API_TIMEOUT / 1000} seconds timeout reached`,
+      return stopCurrentRun({
+        messages,
+        newSessionState,
+        clientSideActions,
+        logs,
+        visitedEdges,
+        setVariableHistory,
+        description: RUNTIME_TIMEOUT_FORCED_STOP_MESSAGE,
+        details: {
+          reason:
+            'Forced stop because the Typebot runtime reached a timeout before the flow could finish.',
+          runtimeTimeoutMs: env.CHAT_API_TIMEOUT,
+        },
       })
     }
 
@@ -138,6 +157,36 @@ export const executeGroup = async (
         visitedEdges,
         setVariableHistory,
       }
+
+    if (isIntegrationBlock(block) && messages.length > 0 && lastBubbleBlockId) {
+      if (hasExceededConsecutiveErrorLimit(newSessionState))
+        return stopCurrentRun({
+          messages,
+          newSessionState,
+          clientSideActions,
+          logs,
+          visitedEdges,
+          setVariableHistory,
+          description: CONSECUTIVE_ERROR_LOOP_FORCED_STOP_MESSAGE,
+          details: {
+            reason: `Forced stop because ${CONSECUTIVE_ERROR_LIMIT} consecutive error logs were recorded in this session.`,
+            consecutiveErrorCount:
+              newSessionState.errorLoopMetadata?.consecutiveErrorCount ?? 0,
+            limit: CONSECUTIVE_ERROR_LIMIT,
+          },
+        })
+
+      return yieldMessagesBeforeIntegration({
+        messages,
+        newSessionState,
+        clientSideActions,
+        logs,
+        visitedEdges,
+        setVariableHistory,
+        lastBubbleBlockId,
+      })
+    }
+
     const executionResponse = (
       isLogicBlock(block)
         ? await executeLogic(newSessionState)(block)
@@ -175,8 +224,29 @@ export const executeGroup = async (
       executionResponse.startTimeShouldBeUpdated
     )
       newStartTime = Date.now()
+    if (executionResponse.newSessionState)
+      newSessionState = executionResponse.newSessionState
     if (executionResponse.logs) {
       logs = [...(logs ?? []), ...executionResponse.logs]
+      newSessionState = updateConsecutiveErrorCount(
+        newSessionState,
+        executionResponse.logs
+      )
+      if (hasExceededCurrentRunWebhookTimeoutLimit(logs))
+        return stopCurrentRun({
+          messages,
+          newSessionState,
+          clientSideActions,
+          logs,
+          visitedEdges,
+          setVariableHistory,
+          description: WEBHOOK_TIMEOUT_LOOP_FORCED_STOP_MESSAGE,
+          details: {
+            reason: `Forced stop because a webhook timed out ${CURRENT_RUN_WEBHOOK_TIMEOUT_LIMIT} times in the same run.`,
+            timeoutCount: getCurrentRunWebhookTimeoutCount(logs),
+            limit: CURRENT_RUN_WEBHOOK_TIMEOUT_LIMIT,
+          },
+        })
       if (hasExceededCurrentRunErrorLimit(logs))
         return {
           messages,
@@ -187,8 +257,6 @@ export const executeGroup = async (
           setVariableHistory,
         }
     }
-    if (executionResponse.newSessionState)
-      newSessionState = executionResponse.newSessionState
     if (
       'clientSideActions' in executionResponse &&
       executionResponse.clientSideActions
@@ -288,6 +356,110 @@ export const executeGroup = async (
 const hasExceededCurrentRunErrorLimit = (logs: ContinueChatResponse['logs']) =>
   (logs?.filter((log) => log.status === 'error').length ?? 0) >
   ERROR_LOOP_LIMIT_PER_MINUTE
+
+const hasExceededCurrentRunWebhookTimeoutLimit = (
+  logs: ContinueChatResponse['logs']
+) => getCurrentRunWebhookTimeoutCount(logs) >= CURRENT_RUN_WEBHOOK_TIMEOUT_LIMIT
+
+const getCurrentRunWebhookTimeoutCount = (logs: ContinueChatResponse['logs']) =>
+  logs?.filter(
+    (log) =>
+      log.status === 'error' &&
+      log.description.startsWith(WEBHOOK_TIMEOUT_DESCRIPTION_PREFIX)
+  ).length ?? 0
+
+const hasExceededConsecutiveErrorLimit = (state: SessionState) =>
+  (state.errorLoopMetadata?.consecutiveErrorCount ?? 0) >=
+  CONSECUTIVE_ERROR_LIMIT
+
+const updateConsecutiveErrorCount = (
+  state: SessionState,
+  logs: ContinueChatResponse['logs']
+): SessionState => {
+  if (!logs || logs.length === 0) return state
+
+  const consecutiveErrorCount = logs.reduce(
+    (count, log) =>
+      log.status === 'error' ? count + 1 : log.status === 'success' ? 0 : count,
+    state.errorLoopMetadata?.consecutiveErrorCount ?? 0
+  )
+
+  return {
+    ...state,
+    errorLoopMetadata:
+      consecutiveErrorCount > 0 ? { consecutiveErrorCount } : undefined,
+  }
+}
+
+const stopCurrentRun = ({
+  messages,
+  newSessionState,
+  clientSideActions,
+  logs,
+  visitedEdges,
+  setVariableHistory,
+  description,
+  details,
+}: {
+  messages: ContinueChatResponse['messages']
+  newSessionState: SessionState
+  clientSideActions: ContinueChatResponse['clientSideActions']
+  logs: ContinueChatResponse['logs']
+  visitedEdges: VisitedEdge[]
+  setVariableHistory: SetVariableHistoryItem[]
+  description: string
+  details: unknown
+}) => ({
+  messages,
+  newSessionState,
+  clientSideActions,
+  logs: [
+    ...(logs ?? []),
+    {
+      status: 'error' as const,
+      description,
+      details,
+    },
+  ],
+  visitedEdges,
+  setVariableHistory,
+})
+
+const yieldMessagesBeforeIntegration = ({
+  messages,
+  newSessionState,
+  clientSideActions,
+  logs,
+  visitedEdges,
+  setVariableHistory,
+  lastBubbleBlockId,
+}: {
+  messages: ContinueChatResponse['messages']
+  newSessionState: SessionState
+  clientSideActions: ContinueChatResponse['clientSideActions']
+  logs: ContinueChatResponse['logs']
+  visitedEdges: VisitedEdge[]
+  setVariableHistory: SetVariableHistoryItem[]
+  lastBubbleBlockId: string
+}) => ({
+  messages,
+  newSessionState: {
+    ...newSessionState,
+    currentBlockId: lastBubbleBlockId,
+  },
+  clientSideActions: [
+    ...(clientSideActions ?? []),
+    {
+      type: 'wait' as const,
+      wait: { secondsToWaitFor: 0 },
+      expectsDedicatedReply: true,
+      lastBubbleBlockId,
+    },
+  ],
+  logs,
+  visitedEdges,
+  setVariableHistory,
+})
 
 const computeRuntimeOptions =
   (state: SessionState) =>

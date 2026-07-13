@@ -101,7 +101,7 @@ const createForcedStopLog = async ({
   }
 }
 
-const stopResultAndDeleteSessions = async ({
+export const stopResultAndDeleteSessions = async ({
   resultId,
   sessionId,
 }: {
