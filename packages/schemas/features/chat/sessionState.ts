@@ -91,6 +91,11 @@ const sessionStateSchemaV3 = sessionStateSchemaV2
     allowedOrigins: z.array(z.string()).optional(),
     setVariableIdsForHistory: z.array(z.string()).optional(),
     currentSetVariableHistoryIndex: z.number().optional(),
+    errorLoopMetadata: z
+      .object({
+        consecutiveErrorCount: z.number(),
+      })
+      .optional(),
     previewMetadata: z
       .object({
         answers: z.array(answerSchema).optional(),

@@ -54,6 +54,11 @@ import {
   ERROR_LOOP_FORCED_STOP_MESSAGE,
   isResultStoppedByErrorLoop,
 } from './logs/errorLoopGuard'
+import {
+  RUNTIME_TIMEOUT_FORCED_STOP_MESSAGE,
+  isResultStoppedByRuntimeTimeout,
+  stopResultOnRuntimeTimeout,
+} from './logs/runtimeTimeoutGuard'
 
 type StartParams =
   | ({
@@ -180,50 +185,62 @@ export const startSession = async ({
     }
   }
 
-  let chatReply = await startBotFlow({
-    version,
-    state: initialState,
-    startFrom:
-      startParams.type === 'preview' ? startParams.startFrom : undefined,
-    startTime: Date.now(),
-    textBubbleContentFormat: startParams.textBubbleContentFormat,
-  })
+  let chatReply: Awaited<ReturnType<typeof startBotFlow>>
+  try {
+    chatReply = await startBotFlow({
+      version,
+      state: initialState,
+      startFrom:
+        startParams.type === 'preview' ? startParams.startFrom : undefined,
+      startTime: Date.now(),
+      textBubbleContentFormat: startParams.textBubbleContentFormat,
+    })
 
-  // If params has message and first block is an input block, we can directly continue the bot flow
-  if (startParams.message) {
-    const firstEdgeId = getFirstEdgeId({
-      typebot: chatReply.newSessionState.typebotsQueue[0].typebot,
-      startEventId:
-        startParams.type === 'preview' &&
-        startParams.startFrom?.type === 'event'
-          ? startParams.startFrom.eventId
-          : undefined,
-    })
-    const nextGroup = await getNextGroup({
-      state: chatReply.newSessionState,
-      edgeId: firstEdgeId,
-      isOffDefaultPath: false,
-    })
-    const newSessionState = nextGroup.newSessionState
-    const firstBlock = nextGroup.group?.blocks.at(0)
-    if (firstBlock && isInputBlock(firstBlock)) {
-      const resultId = newSessionState.typebotsQueue[0].resultId
-      if (resultId)
-        await upsertResult({
-          hasStarted: true,
-          isCompleted: false,
-          resultId,
-          typebot: newSessionState.typebotsQueue[0].typebot,
-        })
-      chatReply = await continueBotFlow(startParams.message, {
-        version,
-        state: {
-          ...newSessionState,
-          currentBlockId: firstBlock.id,
-        },
-        textBubbleContentFormat: startParams.textBubbleContentFormat,
+    // If params has message and first block is an input block, we can directly continue the bot flow
+    if (startParams.message) {
+      const firstEdgeId = getFirstEdgeId({
+        typebot: chatReply.newSessionState.typebotsQueue[0].typebot,
+        startEventId:
+          startParams.type === 'preview' &&
+          startParams.startFrom?.type === 'event'
+            ? startParams.startFrom.eventId
+            : undefined,
       })
+      const nextGroup = await getNextGroup({
+        state: chatReply.newSessionState,
+        edgeId: firstEdgeId,
+        isOffDefaultPath: false,
+      })
+      const newSessionState = nextGroup.newSessionState
+      const firstBlock = nextGroup.group?.blocks.at(0)
+      if (firstBlock && isInputBlock(firstBlock)) {
+        const resultId = newSessionState.typebotsQueue[0].resultId
+        if (resultId)
+          await upsertResult({
+            hasStarted: true,
+            isCompleted: false,
+            resultId,
+            typebot: newSessionState.typebotsQueue[0].typebot,
+          })
+        chatReply = await continueBotFlow(startParams.message, {
+          version,
+          state: {
+            ...newSessionState,
+            currentBlockId: firstBlock.id,
+          },
+          startTime: Date.now(),
+          textBubbleContentFormat: startParams.textBubbleContentFormat,
+        })
+      }
     }
+  } catch (error) {
+    await stopResultOnRuntimeTimeout({
+      error,
+      resultId: result?.id,
+      typebot: initialState.typebotsQueue[0].typebot,
+      hasStarted: initialState.typebotsQueue[0].answers.length > 0,
+    })
+    throw error
   }
 
   const {
@@ -389,6 +406,16 @@ const getResult = async ({
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: `${ERROR_LOOP_FORCED_STOP_MESSAGE}. Start a new result to run this bot again.`,
+    })
+
+  if (
+    resultId &&
+    isRememberUserEnabled &&
+    (await isResultStoppedByRuntimeTimeout(resultId))
+  )
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `${RUNTIME_TIMEOUT_FORCED_STOP_MESSAGE}. Start a new result to run this bot again.`,
     })
 
   const existingResult =

@@ -13,6 +13,11 @@ import {
   ERROR_LOOP_FORCED_STOP_MESSAGE,
   isResultStoppedByErrorLoop,
 } from '../logs/errorLoopGuard'
+import {
+  RUNTIME_TIMEOUT_FORCED_STOP_MESSAGE,
+  isResultStoppedByRuntimeTimeout,
+  stopResultOnRuntimeTimeout,
+} from '../logs/runtimeTimeoutGuard'
 
 type Props = {
   origin: string | undefined
@@ -55,6 +60,14 @@ export const continueChat = async ({
     })
   }
 
+  if (resultId && (await isResultStoppedByRuntimeTimeout(resultId))) {
+    await deleteSession(session.id)
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `${RUNTIME_TIMEOUT_FORCED_STOP_MESSAGE}. Start a new result to run this bot again.`,
+    })
+  }
+
   let corsOrigin
 
   if (
@@ -66,6 +79,25 @@ export const continueChat = async ({
     else corsOrigin = session.state.allowedOrigins[0]
   }
 
+  let chatReply: Awaited<ReturnType<typeof continueBotFlow>>
+  try {
+    chatReply = await continueBotFlow(message, {
+      version: 2,
+      state: session.state,
+      startTime: Date.now(),
+      textBubbleContentFormat,
+    })
+  } catch (error) {
+    await stopResultOnRuntimeTimeout({
+      error,
+      resultId,
+      sessionId: session.id,
+      typebot: session.state.typebotsQueue[0].typebot,
+      hasStarted: session.state.typebotsQueue[0].answers.length > 0,
+    })
+    throw error
+  }
+
   const {
     messages,
     input,
@@ -75,12 +107,7 @@ export const continueChat = async ({
     lastMessageNewFormat,
     visitedEdges,
     setVariableHistory,
-  } = await continueBotFlow(message, {
-    version: 2,
-    state: session.state,
-    startTime: Date.now(),
-    textBubbleContentFormat,
-  })
+  } = chatReply
 
   if (newSessionState)
     await saveStateToDatabase({

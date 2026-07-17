@@ -36,11 +36,17 @@ export const saveStateToDatabase = async ({
   const containsSetVariableClientSideAction = clientSideActions?.some(
     (action) => action.expectsDedicatedReply
   )
+  const hasForcedStopLog = logs?.some(
+    (log) =>
+      log.status === 'error' &&
+      log.description.startsWith('Bot stopped automatically:')
+  )
 
   const isCompleted = Boolean(
     !input &&
       !containsSetVariableClientSideAction &&
-      !hasEmbedBubbleWithWaitEvent
+      !hasEmbedBubbleWithWaitEvent &&
+      (state.typebotsQueue[0].answers.length > 0 || hasForcedStopLog)
   )
 
   const queries: Prisma.PrismaPromise<any>[] = []
@@ -68,7 +74,9 @@ export const saveStateToDatabase = async ({
       resultId,
       typebot: state.typebotsQueue[0].typebot,
       isCompleted: Boolean(
-        !input && !containsSetVariableClientSideAction && answers.length > 0
+        !input &&
+          !containsSetVariableClientSideAction &&
+          (answers.length > 0 || hasForcedStopLog)
       ),
       hasStarted: answers.length > 0,
       lastChatSessionId: session.id,

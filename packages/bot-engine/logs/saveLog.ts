@@ -5,7 +5,7 @@ import {
   isResultStoppedByErrorLoop,
 } from './errorLoopGuard'
 
-const notifyTypebotErrorLog = async (log: {
+export const notifyTypebotErrorLog = async (log: {
   id: string
   createdAt: Date
   resultId: string
@@ -39,7 +39,7 @@ const notifyTypebotErrorLog = async (log: {
       description: log.description,
       details: log.details,
     }),
-  }).catch((err) => {
+  }).catch((err: unknown) => {
     console.warn('Failed to notify Kwik CI about Typebot error log:', err)
   })
 }
