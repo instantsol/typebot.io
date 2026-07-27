@@ -35,7 +35,8 @@ export const TextInput = (props: Props) => {
   const handleInput = (inputValue: string) => setInputValue(inputValue)
 
   const checkIfInputIsValid = () =>
-    inputRef?.value !== '' && inputRef?.reportValidity()
+    selectedFiles().length > 0 ||
+    (inputRef?.value !== '' && inputRef?.reportValidity())
 
   const submit = async () => {
     if (checkIfInputIsValid()) {
