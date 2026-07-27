@@ -21,7 +21,7 @@ import {
   ChatChunk as ChatChunkType,
   OutgoingLog,
 } from '@/types'
-import { isNotDefined } from '@typebot.io/lib'
+import { isNotDefined, isNotEmpty } from '@typebot.io/lib'
 import { executeClientSideAction } from '@/utils/executeClientSideActions'
 import { LoadingChunk } from './LoadingChunk'
 import { PopupBlockedToast } from './PopupBlockedToast'
@@ -155,14 +155,17 @@ export const ConversationContainer = (props: Props) => {
       setIsSending(true)
     }, 1000)
     autoScrollToBottom()
+    const attachedFileUrls = attachments?.map((attachment) => attachment.url)
+    const shouldSendMessage =
+      isNotEmpty(message) || (attachedFileUrls ?? []).length > 0
     const { data, error } = await continueChatQuery({
       apiHost: props.context.apiHost,
       sessionId: props.initialChatReply.sessionId,
-      message: message
+      message: shouldSendMessage
         ? {
             type: 'text',
-            text: message,
-            attachedFileUrls: attachments?.map((attachment) => attachment.url),
+            text: message ?? '',
+            attachedFileUrls,
           }
         : undefined,
     })

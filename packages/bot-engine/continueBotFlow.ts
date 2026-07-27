@@ -283,9 +283,8 @@ const processAndSaveAnswer =
 const saveVariablesValueIfAny =
   (state: SessionState, block: InputBlock) =>
   (reply: Message): SessionState => {
-    if (!block.options?.variableId) return state
-    const newSessionState = saveAttachmentsVarIfAny({ block, reply, state })
-    return saveInputVarIfAny({ block, reply, state: newSessionState })
+    const newSessionState = saveInputVarIfAny({ block, reply, state })
+    return saveAttachmentsVarIfAny({ block, reply, state: newSessionState })
   }
 
 const saveAttachmentsVarIfAny = ({
