@@ -220,27 +220,77 @@ export const executeWebhook = async (
     : baseRequest
 
   try {
-    const response = await ky(request.url, omit(request, 'url'))
-    const body = response.headers.get('content-type')?.includes('json')
-      ? await response.json()
-      : await response.text()
+    let statusCode: number;
+    let body: unknown;
+
+    // TODO: make options
+    // if (block.options?.longRunningRequest) {
+    if (false) {
+      // TODO: .env
+      const apiHost = "https://dev03.instantsandbox.net"
+      const { jobId } = await ky
+        .post(`${apiHost}/ivci/webhook/long_running_request`, {
+          json: request,
+        })
+        .json<{ jobId: string }>();
+
+      const startedAt = Date.now();
+
+      while (true) {
+        const job = await ky
+          .get(`${apiHost}/ivci/webhook/long_running_request/${jobId}`)
+          .json<{
+            status: string;
+            response?: {
+              statusCode: number;
+              data: unknown;
+            };
+            error?: string;
+          }>();
+
+        if (job.status === "finished") {
+          statusCode = job.response!.statusCode;
+          body = job.response!.data;
+          break;
+        }
+
+        if (job.status === "failed") {
+          throw new Error(job.error ?? "Long running request failed.");
+        }
+
+        if (Date.now() - startedAt > 5 * 60 * 1000) {
+          throw new Error("Long running request timed out.");
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    } else {
+      const response = await ky(request.url, omit(request, "url"));
+
+      statusCode = response.status;
+      body = response.headers.get("content-type")?.includes("json")
+        ? await response.json()
+        : await response.text();
+    }
+
     logs.push({
-      status: 'success',
+      status: "success",
       description: webhookSuccessDescription,
       details: {
-        statusCode: response.status,
-        response: typeof body === 'string' ? safeJsonParse(body).data : body,
+        statusCode,
+        response: typeof body === "string" ? safeJsonParse(body).data : body,
         request,
       },
-    })
+    });
+
     return {
       response: {
-        statusCode: response.status,
-        data: typeof body === 'string' ? safeJsonParse(body).data : body,
+        statusCode,
+        data: typeof body === "string" ? safeJsonParse(body).data : body,
       },
       logs,
       startTimeShouldBeUpdated: true,
-    }
+    };
   } catch (error) {
     if (error instanceof HTTPError) {
       const responseBody = error.response.headers
