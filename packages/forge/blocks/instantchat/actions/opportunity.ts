@@ -107,6 +107,10 @@ export const opportunity = createAction({
           parsedValue = num
         }
       }
+      const truncatedTitle =
+        typeof title === 'string' && title.length > 255
+          ? title.slice(0, 255)
+          : title
       const url = `${baseUrl}/ivci/webhook/create_opportunity?page_id=${id_chatbot}&sender_id=${id_cliente}`
       const response = await fetch(url, {
         method: 'POST',
@@ -116,7 +120,7 @@ export const opportunity = createAction({
         body: JSON.stringify({
           journey: journey,
           column: column,
-          title: title,
+          title: truncatedTitle,
           description: description,
           currency: currency,
           value: parsedValue,
