@@ -17,6 +17,7 @@ import { baseOptions } from './baseOptions'
 import { getContact } from './actions/getContact'
 import { flows } from './actions/flows'
 import { flowsResponse } from './actions/flowsResponse'
+import { event } from './actions/event'
 
 export const instantchatBlock = createBlock({
   id: 'instantchat' as const,
@@ -39,6 +40,7 @@ export const instantchatBlock = createBlock({
     getContact,
     groups,
     flows,
-    flowsResponse
+    flowsResponse,
+    event
   ],
 })
