@@ -33,12 +33,18 @@ const metadataSchema = z.object({
   googleTagManagerId: z.string().optional(),
 })
 
+const chatwebSettings = z.object({
+  isEnabled: z.boolean().optional(),
+  message: z.string().optional(),
+})
+
 export const settingsSchema = z
   .object({
     general: generalSettings.optional(),
     typingEmulation: typingEmulation.optional(),
     metadata: metadataSchema.optional(),
     whatsApp: whatsAppSettingsSchema.optional(),
+    chatweb: chatwebSettings.optional(),
     publicShare: z
       .object({
         isEnabled: z.boolean().optional(),

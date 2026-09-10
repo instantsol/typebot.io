@@ -21,6 +21,7 @@ import { MetadataForm } from './MetadataForm'
 import { TypingEmulationForm } from './TypingEmulationForm'
 import { useTypebot } from '@/features/editor/providers/TypebotProvider'
 import { SecurityForm } from './SecurityForm'
+import { ChatwebSettingsForm } from './ChatwebSettingsForm'
 
 export const SettingsSideMenu = () => {
   const { typebot, updateTypebot } = useTypebot()
@@ -46,6 +47,10 @@ export const SettingsSideMenu = () => {
   const handleMetadataChange = (metadata: Settings['metadata']) =>
     typebot &&
     updateTypebot({ updates: { settings: { ...typebot.settings, metadata } } })
+
+  const updateChatweb = (chatweb: Settings['chatweb']) =>
+    typebot &&
+    updateTypebot({ updates: { settings: { ...typebot.settings, chatweb } } })
 
   return (
     <Stack
@@ -129,6 +134,23 @@ export const SettingsSideMenu = () => {
                 typebotName={typebot.name}
                 metadata={typebot.settings.metadata}
                 onMetadataChange={handleMetadataChange}
+              />
+            )}
+          </AccordionPanel>
+        </AccordionItem>
+        <AccordionItem>
+          <AccordionButton py={6}>
+            <HStack flex="1" pl={2}>
+              <ChatIcon />
+              <Heading fontSize="lg">Chatweb redirect</Heading>
+            </HStack>
+            <AccordionIcon />
+          </AccordionButton>
+          <AccordionPanel pb={4} px="6">
+            {typebot && (
+              <ChatwebSettingsForm
+                chatweb={typebot.settings.chatweb}
+                onUpdate={updateChatweb}
               />
             )}
           </AccordionPanel>
