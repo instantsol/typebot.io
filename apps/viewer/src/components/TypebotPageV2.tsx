@@ -78,8 +78,19 @@ export const TypebotPageV2 = ({
       hasQueryParams &&
       (publishedTypebot.settings.general?.isHideQueryParamsEnabled ??
         defaultSettings.general.isHideQueryParamsEnabled) !== false
-    )
-      push(asPath.split('?')[0], undefined, { shallow: true })
+    ) {
+      // chatweb_token must survive in the visible URL even when this bot
+      // hides query params — see TypebotPageV3's identical carve-out.
+      const [path, search] = asPath.split('?')
+      const chatwebToken = new URLSearchParams(search).get('chatweb_token')
+      push(
+        chatwebToken
+          ? `${path}?chatweb_token=${encodeURIComponent(chatwebToken)}`
+          : path,
+        undefined,
+        { shallow: true }
+      )
+    }
   }
 
   const initializeResult = async () => {

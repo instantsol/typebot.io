@@ -1,7 +1,7 @@
 import { Stack } from '@chakra-ui/react'
 import { Settings } from '@typebot.io/schemas'
 import React from 'react'
-import { Textarea } from '@/components/inputs'
+import { TextInput } from '@/components/inputs'
 import { SwitchWithRelatedSettings } from '@/components/SwitchWithRelatedSettings'
 
 type Props = {
@@ -13,22 +13,34 @@ export const ChatwebSettingsForm = ({ chatweb, onUpdate }: Props) => {
   const updateIsEnabled = (isEnabled: boolean) =>
     onUpdate({ ...chatweb, isEnabled })
 
-  const updateMessage = (message: string) =>
-    onUpdate({ ...chatweb, message })
+  const updateSubtitle = (subtitle: string) =>
+    onUpdate({ ...chatweb, subtitle })
+
+  const updateButtonLabel = (buttonLabel: string) =>
+    onUpdate({ ...chatweb, buttonLabel })
 
   return (
     <Stack spacing={6}>
       <SwitchWithRelatedSettings
         label={'Redirect WhatsApp to chatweb'}
-        moreInfoContent="When enabled, conversations that start on WhatsApp for this bot are redirected here (chatweb) instead of continuing on WhatsApp. Only takes effect when the enterprise-wide setting is off."
+        moreInfoContent="When enabled, conversations that start on WhatsApp for this bot are redirected here (chatweb) instead of continuing on WhatsApp. Only takes effect when the enterprise-wide setting is off. The redirect is delivered as a WhatsApp button message; any of these fields left blank falls back to the enterprise-wide default."
         initialValue={chatweb?.isEnabled ?? false}
         onCheckChange={updateIsEnabled}
       >
-        <Textarea
-          defaultValue={chatweb?.message ?? ''}
-          onChange={updateMessage}
-          label="Redirect message:"
-        />
+        <Stack spacing={4}>
+          <TextInput
+            defaultValue={chatweb?.subtitle ?? ''}
+            onChange={updateSubtitle}
+            label="Button message subtitle:"
+            helperText="Main message text. WhatsApp limit: 1024 characters."
+          />
+          <TextInput
+            defaultValue={chatweb?.buttonLabel ?? ''}
+            onChange={updateButtonLabel}
+            label="Button label:"
+            helperText="Text shown on the button itself. WhatsApp limit: 20 characters."
+          />
+        </Stack>
       </SwitchWithRelatedSettings>
     </Stack>
   )
