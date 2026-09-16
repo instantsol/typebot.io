@@ -38,7 +38,19 @@ export const TypebotPageV3 = ({
       )
     )
       return
-    push(asPath.split('?')[0], undefined, { shallow: true })
+    // chatweb_token must survive in the visible URL even when this bot hides
+    // query params — it's the only way WhatsApp's in-app browser "open in
+    // browser" action (which reopens the browser's current address, not the
+    // originally-tapped link) can resume the same session externally.
+    const [path, search] = asPath.split('?')
+    const chatwebToken = new URLSearchParams(search).get('chatweb_token')
+    push(
+      chatwebToken
+        ? `${path}?chatweb_token=${encodeURIComponent(chatwebToken)}`
+        : path,
+      undefined,
+      { shallow: true }
+    )
   }
 
   const apiOrigin = useMemo(() => new URL(url).origin, [url])

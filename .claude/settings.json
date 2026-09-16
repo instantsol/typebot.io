@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mysql -u root -pinstant typebot -e \"SELECT b.id, b.type, JSON_EXTRACT\\(b.options, ''$.action''\\) as action FROM Block b WHERE b.type = ''instantchat'' AND JSON_EXTRACT\\(b.options, ''$.action''\\) NOT IN \\(''Fila'', ''Horário'', ''Cortex'', ''Infos'', ''WhatsApp Notify'', ''Detectar Intenção'', ''Atualizar Contato'', ''Obter Contato''\\) AND JSON_EXTRACT\\(b.options, ''$.action''\\) IS NOT NULL LIMIT 20\")",
+      "Bash(mysql -u root -pinstant -h 127.0.0.1 typebot -e \"SHOW TABLES;\")",
+      "Bash(mysql -u root -pinstant -h 127.0.0.1 typebot -e \"SELECT id, name FROM Typebot LIMIT 5;\")",
+      "Bash(git log --all --oneline -- packages/forge/blocks/instantchat/actions/opportunity* packages/forge/blocks/instantchat/index.ts)",
+      "Bash(mysql -u root -pinstant -h 127.0.0.1 typebot 2)",
+      "Bash(1:*)"
+    ]
+  }
+}

@@ -42,6 +42,9 @@ export const getServerSideProps: GetServerSideProps = async (
       browser.regex.test(context.req.headers['user-agent'] ?? '')
     )?.name ?? null
   const pathname = context.resolvedUrl.split('?')[0]
+  const search = context.resolvedUrl.includes('?')
+    ? context.resolvedUrl.slice(context.resolvedUrl.indexOf('?'))
+    : ''
   const { host, forwardedHost } = getHost(context.req)
   log(`host: ${host}`)
   log(`forwardedHost: ${forwardedHost}`)
@@ -74,11 +77,31 @@ export const getServerSideProps: GetServerSideProps = async (
       ? await getTypebotFromPublicId(context.query.publicId?.toString())
       : await getTypebotFromCustomDomain(customDomain)
 
+    // isHideQueryParamsEnabled defaults to true (see settings/constants.ts),
+    // so most bots hide query params from the visible URL/og:url by default —
+    // that's fine for ordinary prefilled variables, but chatweb_token isn't a
+    // cosmetic/tracking param: it's the only way WhatsApp's in-app browser
+    // "open in browser" action (which reopens the page's own og:url, not the
+    // literally-tapped link) can resume the same session externally. Always
+    // keep chatweb_token in og:url regardless of that setting; everything
+    // else still follows it.
+    const hideQueryParams =
+      (publishedTypebot && 'typebot' in publishedTypebot
+        ? publishedTypebot.settings.general?.isHideQueryParamsEnabled
+        : publishedTypebot?.isHideQueryParamsEnabled) ??
+      defaultSettings.general.isHideQueryParamsEnabled
+    const chatwebToken = new URLSearchParams(search).get('chatweb_token')
+    const urlPath = hideQueryParams
+      ? chatwebToken
+        ? `${pathname}?chatweb_token=${encodeURIComponent(chatwebToken)}`
+        : pathname
+      : `${pathname}${search}`
+
     return {
       props: {
         publishedTypebot,
         incompatibleBrowser,
-        url: `${protocol}://${forwardedHost ?? host}${pathname}`,
+        url: `${protocol}://${forwardedHost ?? host}${urlPath}`,
       },
     }
   } catch (err) {

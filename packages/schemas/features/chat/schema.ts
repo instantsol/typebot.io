@@ -390,5 +390,16 @@ export const startPreviewChatResponseSchema = startChatResponseSchema.omit({
   resultId: true,
 })
 
-export const continueChatResponseSchema = chatResponseBaseSchema
+export const continueChatResponseSchema = chatResponseBaseSchema.merge(
+  z.object({
+    // Reports which bot is now active in the session — may differ from the
+    // one the session started with if a "Bot" link block jumped elsewhere
+    // while processing this message. See chatweb-redirect-bot-link.
+    typebot: z
+      .object({
+        id: z.string(),
+      })
+      .optional(),
+  })
+)
 export type ContinueChatResponse = z.infer<typeof continueChatResponseSchema>

@@ -144,6 +144,13 @@ export const continueChat = async ({
     logs: isPreview ? logs : logs?.filter(filterPotentiallySensitiveLogs),
     lastMessageNewFormat,
     corsOrigin,
+    // Reports which bot is now active (may differ from the one this session
+    // started with, if a "Bot" link block jumped elsewhere while processing
+    // this message) — mirrors startChat's existing typebot.id, which was
+    // already the only place this was exposed. See chatweb-redirect-bot-link.
+    typebot: {
+      id: newSessionState.typebotsQueue[0].typebot.id,
+    },
     progress: newSessionState.progressMetadata
       ? isEnded
         ? 100
