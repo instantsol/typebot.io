@@ -506,7 +506,7 @@ const parseStartClientSideAction = (
   return { type: 'startPropsToInject', startPropsToInject }
 }
 
-const sanitizeAndParseTheme = (
+export const sanitizeAndParseTheme = (
   theme: Theme,
   { variables }: { variables: Variable[] }
 ): Theme => ({
