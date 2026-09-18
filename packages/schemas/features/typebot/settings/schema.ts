@@ -35,6 +35,7 @@ const metadataSchema = z.object({
 
 const chatwebSettings = z.object({
   isEnabled: z.boolean().optional(),
+  withButton: z.boolean().optional(),
   subtitle: z.string().optional(),
   buttonLabel: z.string().optional(),
 })
