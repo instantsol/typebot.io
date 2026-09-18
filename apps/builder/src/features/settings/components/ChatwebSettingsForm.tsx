@@ -2,6 +2,7 @@ import { Stack } from '@chakra-ui/react'
 import { Settings } from '@typebot.io/schemas'
 import React from 'react'
 import { TextInput } from '@/components/inputs'
+import { SwitchWithLabel } from '@/components/inputs/SwitchWithLabel'
 import { SwitchWithRelatedSettings } from '@/components/SwitchWithRelatedSettings'
 
 type Props = {
@@ -12,6 +13,9 @@ type Props = {
 export const ChatwebSettingsForm = ({ chatweb, onUpdate }: Props) => {
   const updateIsEnabled = (isEnabled: boolean) =>
     onUpdate({ ...chatweb, isEnabled })
+
+  const updateWithButton = (withButton: boolean) =>
+    onUpdate({ ...chatweb, withButton })
 
   const updateSubtitle = (subtitle: string) =>
     onUpdate({ ...chatweb, subtitle })
@@ -28,6 +32,12 @@ export const ChatwebSettingsForm = ({ chatweb, onUpdate }: Props) => {
         onCheckChange={updateIsEnabled}
       >
         <Stack spacing={4}>
+          <SwitchWithLabel
+            label="Use WhatsApp button"
+            initialValue={chatweb?.withButton ?? false}
+            onCheckChange={updateWithButton}
+            moreInfoContent="When enabled, the redirect is sent as a clickable WhatsApp button."
+          />
           <TextInput
             defaultValue={chatweb?.subtitle ?? ''}
             onChange={updateSubtitle}
