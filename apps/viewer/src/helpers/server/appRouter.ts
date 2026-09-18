@@ -7,6 +7,7 @@ import { generateUploadUrl as generateUploadUrlV1 } from '@/features/fileUpload/
 import { generateUploadUrl } from '@/features/fileUpload/api/generateUploadUrl'
 import { sendMessageV2 } from '@/features/chat/api/legacy/sendMessageV2'
 import { continueChat } from '@/features/chat/api/continueChat'
+import { resumeSession } from '@/features/chat/api/resumeSession'
 import { saveClientLogs } from '@/features/chat/api/saveClientLogs'
 import { startChat } from '@/features/chat/api/startChat'
 import { startChatPreview } from '@/features/chat/api/startChatPreview'
@@ -16,6 +17,7 @@ export const appRouter = router({
   sendMessageV2,
   startChat,
   continueChat,
+  resumeSession,
   startChatPreview: startChatPreview,
   getUploadUrl,
   generateUploadUrlV1,
