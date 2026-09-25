@@ -314,49 +314,59 @@ export const ConversationContainer = (props: Props) => {
 
   return (
     <div
-      ref={chatContainer}
-      class="flex flex-col overflow-y-auto w-full px-3 pt-10 relative scrollable-container typebot-chat-view scroll-smooth gap-2"
+      class={
+        theme().chat?.background?.type === 'Color' ||
+        (theme().chat?.background?.type === 'Image' &&
+          theme().chat?.background?.content)
+          ? 'typebot-chat-background-container'
+          : 'contents'
+      }
     >
-      <For each={chatChunks()}>
-        {(chatChunk, index) => (
-          <ChatChunk
-            index={index()}
-            messages={chatChunk.messages}
-            input={chatChunk.input}
-            theme={theme()}
-            settings={props.initialChatReply.typebot.settings}
-            streamingMessageId={chatChunk.streamingMessageId}
-            context={props.context}
-            hideAvatar={
-              !chatChunk.input &&
-              ((chatChunks()[index() + 1]?.messages ?? 0).length > 0 ||
-                chatChunks()[index() + 1]?.streamingMessageId !== undefined ||
-                (chatChunk.messages.length > 0 && isSending()))
-            }
-            hasError={hasError() && index() === chatChunks().length - 1}
-            isTransitionDisabled={index() !== chatChunks().length - 1}
-            onNewBubbleDisplayed={handleNewBubbleDisplayed}
-            onAllBubblesDisplayed={handleAllBubblesDisplayed}
-            onSubmit={sendMessage}
-            onScrollToBottom={autoScrollToBottom}
-            onSkip={handleSkip}
-          />
-        )}
-      </For>
-      <Show when={isSending()}>
-        <LoadingChunk theme={theme()} />
-      </Show>
-      <Show when={blockedPopupUrl()} keyed>
-        {(blockedPopupUrl) => (
-          <div class="flex justify-end">
-            <PopupBlockedToast
-              url={blockedPopupUrl}
-              onLinkClick={() => setBlockedPopupUrl(undefined)}
+      <div
+        ref={chatContainer}
+        class="flex flex-col overflow-y-auto w-full px-3 pt-10 relative scrollable-container typebot-chat-view scroll-smooth gap-2"
+      >
+        <For each={chatChunks()}>
+          {(chatChunk, index) => (
+            <ChatChunk
+              index={index()}
+              messages={chatChunk.messages}
+              input={chatChunk.input}
+              theme={theme()}
+              settings={props.initialChatReply.typebot.settings}
+              streamingMessageId={chatChunk.streamingMessageId}
+              context={props.context}
+              hideAvatar={
+                !chatChunk.input &&
+                ((chatChunks()[index() + 1]?.messages ?? 0).length > 0 ||
+                  chatChunks()[index() + 1]?.streamingMessageId !== undefined ||
+                  (chatChunk.messages.length > 0 && isSending()))
+              }
+              hasError={hasError() && index() === chatChunks().length - 1}
+              isTransitionDisabled={index() !== chatChunks().length - 1}
+              onNewBubbleDisplayed={handleNewBubbleDisplayed}
+              onAllBubblesDisplayed={handleAllBubblesDisplayed}
+              onSubmit={sendMessage}
+              onScrollToBottom={autoScrollToBottom}
+              onSkip={handleSkip}
             />
-          </div>
-        )}
-      </Show>
-      <BottomSpacer />
+          )}
+        </For>
+        <Show when={isSending()}>
+          <LoadingChunk theme={theme()} />
+        </Show>
+        <Show when={blockedPopupUrl()} keyed>
+          {(blockedPopupUrl) => (
+            <div class="flex justify-end">
+              <PopupBlockedToast
+                url={blockedPopupUrl}
+                onLinkClick={() => setBlockedPopupUrl(undefined)}
+              />
+            </div>
+          )}
+        </Show>
+        <BottomSpacer />
+      </div>
     </div>
   )
 }

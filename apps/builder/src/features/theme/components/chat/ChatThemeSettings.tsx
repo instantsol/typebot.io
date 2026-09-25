@@ -10,7 +10,10 @@ import { AvatarForm } from './AvatarForm'
 import { useTranslate } from '@tolgee/react'
 import { ChatContainerForm } from './ChatContainerForm'
 import { ContainerThemeForm } from './ContainerThemeForm'
+import { BackgroundSelector } from '../general/BackgroundSelector'
+import { ChatWebPreview } from './ChatWebPreview'
 import {
+  BackgroundType,
   defaultButtonsBackgroundColor,
   defaultButtonsColor,
   defaultButtonsBorderThickness,
@@ -46,11 +49,21 @@ export const ChatThemeSettings = ({
 
   const updateHostBubbles = (
     hostBubbles: NonNullable<Theme['chat']>['hostBubbles']
-  ) => onChatThemeChange({ ...chatTheme, hostBubbles })
+  ) =>
+    onChatThemeChange({
+      ...chatTheme,
+      hostBubbles,
+      isChatWebThemeEnabled: true,
+    })
 
   const updateGuestBubbles = (
     guestBubbles: NonNullable<Theme['chat']>['guestBubbles']
-  ) => onChatThemeChange({ ...chatTheme, guestBubbles })
+  ) =>
+    onChatThemeChange({
+      ...chatTheme,
+      guestBubbles,
+      isChatWebThemeEnabled: true,
+    })
 
   const updateButtons = (buttons: NonNullable<Theme['chat']>['buttons']) =>
     onChatThemeChange({ ...chatTheme, buttons })
@@ -76,6 +89,24 @@ export const ChatThemeSettings = ({
 
   return (
     <Stack spacing={6}>
+      <ChatWebPreview
+        chatTheme={chatTheme}
+        generalBackground={generalBackground}
+      />
+      <Stack borderWidth={1} rounded="md" p="4" spacing={4}>
+        <Heading fontSize="lg">{t('theme.sideMenu.chat.background')}</Heading>
+        <BackgroundSelector
+          fileName="chatBackground"
+          background={chatTheme?.background ?? { type: BackgroundType.NONE }}
+          onBackgroundChange={(background) =>
+            onChatThemeChange({
+              ...chatTheme,
+              background,
+              isChatWebThemeEnabled: true,
+            })
+          }
+        />
+      </Stack>
       <Stack borderWidth={1} rounded="md" p="4" spacing={4}>
         <Heading fontSize="lg">Container</Heading>
         <ChatContainerForm
