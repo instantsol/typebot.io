@@ -24,6 +24,10 @@ export const defaultFontFamily = 'Open Sans'
 // Background
 export const defaultBackgroundType = BackgroundType.COLOR
 export const defaultBackgroundColor = '#ffffff'
+export const backgroundImageMaxSizeMB = 0.5
+export const backgroundImageMimeTypes = ['image/jpeg', 'image/jpg', 'image/png']
+export const isBackgroundImageFileName = (fileName: string) =>
+  /^(background|chatBackground)(-[a-z0-9]+)?$/.test(fileName)
 
 // Progress bar
 export const defaultProgressBarIsEnabled = false

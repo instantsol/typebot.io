@@ -6,6 +6,11 @@ import { generatePresignedPostPolicy } from '@typebot.io/lib/s3/generatePresigne
 import prisma from '@typebot.io/lib/prisma'
 import { isWriteWorkspaceForbidden } from '@/features/workspace/helpers/isWriteWorkspaceForbidden'
 import { isWriteTypebotForbidden } from '@/features/typebot/helpers/isWriteTypebotForbidden'
+import {
+  backgroundImageMaxSizeMB,
+  backgroundImageMimeTypes,
+  isBackgroundImageFileName,
+} from '@typebot.io/schemas/features/typebot/theme/constants'
 
 const inputSchema = z.object({
   filePathProps: z
@@ -44,6 +49,14 @@ export type FilePathUploadProps = z.infer<
 export const generateUploadUrl = authenticatedProcedure
   .input(inputSchema)
   .mutation(async ({ input: { filePathProps, fileType }, ctx: { user } }) => {
+    const isBackground =
+      'fileName' in filePathProps &&
+      isBackgroundImageFileName(filePathProps.fileName)
+    if (isBackground && !backgroundImageMimeTypes.includes(fileType ?? ''))
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Use a JPEG or PNG background image.',
+      })
     if (!env.S3_ENDPOINT || !env.S3_ACCESS_KEY || !env.S3_SECRET_KEY)
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
@@ -65,6 +78,7 @@ export const generateUploadUrl = authenticatedProcedure
     const presignedPostPolicy = await generatePresignedPostPolicy({
       fileType,
       filePath,
+      maxFileSize: isBackground ? backgroundImageMaxSizeMB : undefined,
     })
 
     return {

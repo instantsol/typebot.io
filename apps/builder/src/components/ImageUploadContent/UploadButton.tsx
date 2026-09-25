@@ -1,9 +1,15 @@
 import { useToast } from '@/hooks/useToast'
 import { Button, ButtonProps, chakra } from '@chakra-ui/react'
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useEffect, useId, useRef, useState } from 'react'
 import { FilePathUploadProps } from '@/features/upload/api/generateUploadUrl'
 import { trpc } from '@/lib/trpc'
 import { compressFile } from '@/helpers/compressFile'
+import { createId } from '@paralleldrive/cuid2'
+import {
+  backgroundImageMaxSizeMB,
+  backgroundImageMimeTypes,
+  isBackgroundImageFileName,
+} from '@typebot.io/schemas/features/typebot/theme/constants'
 
 type UploadButtonProps = {
   fileType: 'image' | 'audio' | string
@@ -19,14 +25,48 @@ export const UploadButton = ({
 }: UploadButtonProps) => {
   const [isUploading, setIsUploading] = useState(false)
   const { showToast } = useToast()
-  const [file, setFile] = useState<File>()
+  const inputId = useId()
+  const uploadController = useRef<AbortController>()
+  const onFileUploadedRef = useRef(onFileUploaded)
+  onFileUploadedRef.current = onFileUploaded
+  const isBackground =
+    'fileName' in filePathProps &&
+    isBackgroundImageFileName(filePathProps.fileName)
+  const { mutateAsync } = trpc.generateUploadUrl.useMutation()
 
-  const { mutate } = trpc.generateUploadUrl.useMutation({
-    onSettled: () => {
-      setIsUploading(false)
-    },
-    onSuccess: async (data) => {
-      if (!file) return
+  useEffect(() => () => uploadController.current?.abort(), [])
+
+  const handleInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0]
+    e.target.value = ''
+    if (!selectedFile || isUploading) return
+    setIsUploading(true)
+    const controller = new AbortController()
+    uploadController.current = controller
+    try {
+      if (
+        isBackground &&
+        (!selectedFile.size ||
+          !backgroundImageMimeTypes.includes(selectedFile.type))
+      )
+        throw new Error('Selecione uma imagem JPEG ou PNG válida.')
+      const file = await compressFile(selectedFile)
+      if (isBackground && file.size > backgroundImageMaxSizeMB * 1024 * 1024)
+        throw new Error(
+          `A imagem deve ter no máximo ${backgroundImageMaxSizeMB} MB após a compressão.`
+        )
+      if (controller.signal.aborted) return
+      const data = await mutateAsync({
+        filePathProps:
+          isBackground && 'fileName' in filePathProps
+            ? {
+                ...filePathProps,
+                fileName: `${filePathProps.fileName}-${createId()}`,
+              }
+            : filePathProps,
+        fileType: file.type,
+      })
+      if (controller.signal.aborted) return
       const formData = new FormData()
       Object.entries(data.formData).forEach(([key, value]) => {
         formData.append(key, value)
@@ -35,28 +75,26 @@ export const UploadButton = ({
       const upload = await fetch(data.presignedUrl, {
         method: 'POST',
         body: formData,
+        signal: controller.signal,
       })
 
       if (!upload.ok) {
-        showToast({ description: 'Error while trying to upload the file.' })
-        return
+        throw new Error('Error while trying to upload the file.')
       }
 
-      onFileUploaded(data.fileUrl + '?v=' + Date.now(), file.name)
-    },
-  })
-
-  const handleInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    if (!e.target?.files) return
-    setIsUploading(true)
-    const file = e.target.files[0] as File | undefined
-    if (!file)
-      return showToast({ description: 'Could not read file.', status: 'error' })
-    setFile(await compressFile(file))
-    mutate({
-      filePathProps,
-      fileType: file.type,
-    })
+      if (!controller.signal.aborted)
+        onFileUploadedRef.current(data.fileUrl + '?v=' + Date.now(), file.name)
+    } catch (error) {
+      if (!controller.signal.aborted)
+        showToast({
+          description:
+            error instanceof Error
+              ? error.message
+              : 'Error while trying to upload the file.',
+        })
+    } finally {
+      if (!controller.signal.aborted) setIsUploading(false)
+    }
   }
 
   return (
@@ -64,15 +102,18 @@ export const UploadButton = ({
       <chakra.input
         data-testid="file-upload-input"
         type="file"
-        id="file-input"
+        id={inputId}
         display="none"
         onChange={handleInputChange}
-        accept={fileType + '/*'} // === 'image' ? 'image/*' : 'audio/*'}
+        accept={
+          isBackground ? backgroundImageMimeTypes.join(',') : fileType + '/*'
+        }
+        disabled={isUploading}
       />
       <Button
         as="label"
         size="sm"
-        htmlFor="file-input"
+        htmlFor={inputId}
         cursor="pointer"
         isLoading={isUploading}
         {...props}

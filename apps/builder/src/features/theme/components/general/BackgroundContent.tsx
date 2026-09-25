@@ -23,11 +23,13 @@ import { useTranslate } from '@tolgee/react'
 
 type BackgroundContentProps = {
   background?: Background
+  fileName?: string
   onBackgroundContentChange: (content: string) => void
 }
 
 export const BackgroundContent = ({
   background,
+  fileName = 'background',
   onBackgroundContentChange,
 }: BackgroundContentProps) => {
   const { t } = useTranslate()
@@ -41,16 +43,25 @@ export const BackgroundContent = ({
       <Popover isLazy placement="top">
         <PopoverTrigger>
           {isNotEmpty(background?.content) ? (
-            <Image
-              src={background?.content}
-              alt={t('theme.sideMenu.global.background.image.alt')}
-              cursor="pointer"
-              _hover={{ filter: 'brightness(.9)' }}
-              transition="filter 200ms"
-              rounded="md"
-              maxH="200px"
-              objectFit="cover"
-            />
+            <Button
+              variant="unstyled"
+              h="auto"
+              aria-label={t('theme.sideMenu.background.replace')}
+            >
+              <Image
+                src={background?.content}
+                alt={t('theme.sideMenu.global.background.image.alt')}
+                cursor="pointer"
+                _hover={{ filter: 'brightness(.9)' }}
+                transition="filter 200ms"
+                rounded="md"
+                maxH="200px"
+                objectFit="cover"
+              />
+              <Text fontSize="sm">
+                {t('theme.sideMenu.background.replace')}
+              </Text>
+            </Button>
           ) : (
             <Button>
               {t('theme.sideMenu.global.background.image.button')}
@@ -58,16 +69,18 @@ export const BackgroundContent = ({
           )}
         </PopoverTrigger>
         <Portal>
-          <PopoverContent p="4" w="500px">
+          <PopoverContent p="4" w="500px" maxW="calc(100vw - 32px)">
             <ImageUploadContent
+              key={typebot.id}
               uploadFileProps={{
                 workspaceId: typebot.workspaceId,
                 typebotId: typebot.id,
-                fileName: 'background',
+                fileName,
               }}
               defaultUrl={background?.content}
               onSubmit={handleContentChange}
               excludedTabs={['giphy', 'icon']}
+              initialTab="upload"
             />
           </PopoverContent>
         </Portal>

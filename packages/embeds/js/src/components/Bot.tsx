@@ -1,5 +1,12 @@
 import { LiteBadge } from './LiteBadge'
-import { createEffect, createSignal, onCleanup, onMount, Show } from 'solid-js'
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  onCleanup,
+  onMount,
+  Show,
+} from 'solid-js'
 import { isDefined, isNotDefined, isNotEmpty } from '@typebot.io/lib'
 import { startChatQuery } from '@/queries/startChatQuery'
 import { ConversationContainer } from './ConversationContainer'
@@ -14,6 +21,7 @@ import {
   wipeExistingChatStateInStorage,
 } from '@/utils/storage'
 import { setCssVariablesValue } from '@/utils/setCssVariablesValue'
+import { getChatWebTheme } from '@typebot.io/theme/getChatWebTheme'
 import immutableCss from '../assets/immutable.css'
 import {
   Font,
@@ -270,12 +278,118 @@ const BotContent = (props: BotContentProps) => {
   )
   let botContainer: HTMLDivElement | undefined
 
+  const chatWebFrames = new Map<
+    HTMLIFrameElement,
+    {
+      onLoad: () => void
+      bubble: Element | null
+    }
+  >()
+  const chatWebTheme = createMemo(() =>
+    getChatWebTheme(props.initialChatReply.typebot.theme.chat)
+  )
+
+  const getChatWebUrl = (iframe: HTMLIFrameElement) => {
+    try {
+      const url = new URL(iframe.src, window.location.href)
+      if (
+        ['http:', 'https:'].includes(url.protocol) &&
+        url.pathname.startsWith('/builder_chat/')
+      )
+        return url
+    } catch {
+      return undefined
+    }
+  }
+
+  const sendChatWebTheme = (
+    iframe: HTMLIFrameElement,
+    expectedOrigin?: string
+  ) => {
+    const url = getChatWebUrl(iframe)
+    if (!url || (expectedOrigin && url.origin !== expectedOrigin)) return
+    iframe.contentWindow?.postMessage(
+      {
+        kwikEvent: 'chatweb-theme',
+        chat: chatWebTheme(),
+      },
+      url.origin
+    )
+  }
+
+  const syncChatWebFrames = (resendTheme = false) => {
+    if (!botContainer) return
+    const frames = new Set(
+      Array.from(botContainer.querySelectorAll('iframe')).filter((iframe) =>
+        getChatWebUrl(iframe)
+      )
+    )
+    const enabled = chatWebTheme().isChatWebThemeEnabled
+    botContainer.classList.toggle(
+      'typebot-chatweb-active',
+      enabled && frames.size > 0
+    )
+    chatWebFrames.forEach(({ onLoad, bubble }, iframe) => {
+      if (frames.has(iframe)) return
+      iframe.removeEventListener('load', onLoad)
+      bubble?.classList.remove('typebot-chatweb-embed')
+      chatWebFrames.delete(iframe)
+    })
+    frames.forEach((iframe) => {
+      const bubble = iframe.closest('.typebot-host-bubble')
+      const registered = chatWebFrames.get(iframe)
+      if (registered && registered.bubble !== bubble) {
+        registered.bubble?.classList.remove('typebot-chatweb-embed')
+        registered.bubble = bubble
+      }
+      bubble?.classList.toggle('typebot-chatweb-embed', enabled)
+      if (registered) {
+        if (resendTheme) registered.onLoad()
+        return
+      }
+      const onLoad = () => sendChatWebTheme(iframe)
+      chatWebFrames.set(iframe, { onLoad, bubble })
+      iframe.addEventListener('load', onLoad)
+      onLoad()
+    })
+  }
+
+  const handleChatWebThemeRequest = (event: MessageEvent) => {
+    if (event.data?.kwikEvent !== 'request-chatweb-theme') return
+    for (const iframe of chatWebFrames.keys()) {
+      if (iframe.contentWindow !== event.source) continue
+      sendChatWebTheme(iframe, event.origin)
+      break
+    }
+  }
+
+  const chatWebObserver = new MutationObserver((mutations) => {
+    const framesChanged = mutations.some((mutation) =>
+      mutation.type === 'attributes'
+        ? mutation.target instanceof HTMLIFrameElement
+        : [...mutation.addedNodes, ...mutation.removedNodes].some(
+            (node) =>
+              node instanceof Element &&
+              (node.matches('iframe') || node.querySelector('iframe'))
+          )
+    )
+    if (framesChanged) syncChatWebFrames()
+  })
+
   const resizeObserver = new ResizeObserver((entries) => {
     return setIsMobile(entries[0].target.clientWidth < 400)
   })
 
   onMount(() => {
     if (!botContainer) return
+    window.addEventListener('message', handleChatWebThemeRequest)
+    chatWebObserver.observe(botContainer, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['src'],
+    })
+    syncChatWebFrames()
     resizeObserver.observe(botContainer)
     setBotContainerHeight(`${botContainer.clientHeight}px`)
   })
@@ -295,7 +409,18 @@ const BotContent = (props: BotContentProps) => {
     )
   })
 
+  createEffect(() => {
+    chatWebTheme()
+    syncChatWebFrames(true)
+  })
+
   onCleanup(() => {
+    window.removeEventListener('message', handleChatWebThemeRequest)
+    chatWebObserver.disconnect()
+    chatWebFrames.forEach(({ onLoad }, iframe) =>
+      iframe.removeEventListener('load', onLoad)
+    )
+    chatWebFrames.clear()
     if (!botContainer) return
     resizeObserver.unobserve(botContainer)
   })

@@ -1,5 +1,13 @@
 import { RadioButtons } from '@/components/inputs/RadioButtons'
-import { Stack } from '@chakra-ui/react'
+import {
+  Button,
+  Stack,
+  Text,
+  Slider,
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb,
+} from '@chakra-ui/react'
 import { Background } from '@typebot.io/schemas'
 import React from 'react'
 import { BackgroundContent } from './BackgroundContent'
@@ -11,11 +19,13 @@ import { useTranslate } from '@tolgee/react'
 
 type Props = {
   background?: Background
+  fileName?: string
   onBackgroundChange: (newBackground: Background) => void
 }
 
 export const BackgroundSelector = ({
   background,
+  fileName,
   onBackgroundChange,
 }: Props) => {
   const { t } = useTranslate()
@@ -48,8 +58,38 @@ export const BackgroundSelector = ({
       />
       <BackgroundContent
         background={background}
+        fileName={fileName}
         onBackgroundContentChange={handleBackgroundContentChange}
       />
+      {background?.type === BackgroundType.IMAGE && background.content && (
+        <>
+          <Text>
+            {t('theme.sideMenu.background.opacity')}:{' '}
+            {Math.round((background.opacity ?? 1) * 100)}%
+          </Text>
+          <Slider
+            aria-label={t('theme.sideMenu.background.opacity')}
+            value={Math.round((background.opacity ?? 1) * 100)}
+            min={0}
+            max={100}
+            onChange={(value) =>
+              onBackgroundChange({ ...background, opacity: value / 100 })
+            }
+          >
+            <SliderTrack>
+              <SliderFilledTrack />
+            </SliderTrack>
+            <SliderThumb />
+          </Slider>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onBackgroundChange({ type: BackgroundType.NONE })}
+          >
+            {t('theme.sideMenu.background.remove')}
+          </Button>
+        </>
+      )}
     </Stack>
   )
 }

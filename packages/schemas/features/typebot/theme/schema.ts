@@ -44,8 +44,16 @@ const chatContainerSchema = z
   })
   .merge(containerThemeSchema)
 
+const backgroundSchema = z.object({
+  type: z.nativeEnum(BackgroundType).optional(),
+  content: z.string().optional(),
+  opacity: z.number().min(0).max(1).optional(),
+})
+
 export const chatThemeSchema = z.object({
+  isChatWebThemeEnabled: z.boolean().optional(),
   container: chatContainerSchema.optional(),
+  background: backgroundSchema.optional(),
   hostAvatar: avatarPropsSchema.optional(),
   guestAvatar: avatarPropsSchema.optional(),
   hostBubbles: containerThemeSchema.optional(),
@@ -56,11 +64,6 @@ export const chatThemeSchema = z.object({
     .enum(['none', 'medium', 'large'])
     .optional()
     .describe('Deprecated, use `container.border.roundeness` instead'),
-})
-
-const backgroundSchema = z.object({
-  type: z.nativeEnum(BackgroundType).optional(),
-  content: z.string().optional().optional(),
 })
 
 const googleFontSchema = z.object({

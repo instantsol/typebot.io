@@ -129,6 +129,11 @@ export const setCssVariablesValue = (
   if (!theme) return
   const documentStyle = container?.style
   if (!documentStyle) return
+  container.classList.toggle(
+    'typebot-page-background-layer',
+    theme.general?.background?.type === BackgroundType.IMAGE &&
+      theme.general.background.opacity !== undefined
+  )
   setGeneralTheme(theme.general, documentStyle, isPreview)
   setChatTheme(theme.chat, theme.general?.background, documentStyle)
 }
@@ -192,6 +197,27 @@ const setChatTheme = (
   generalBackground: GeneralTheme['background'],
   documentStyle: CSSStyleDeclaration
 ) => {
+  documentStyle.setProperty(
+    '--typebot-chat-background-image',
+    chatTheme?.background?.type === BackgroundType.IMAGE &&
+      chatTheme.background.content
+      ? `url(${JSON.stringify(chatTheme.background.content)})`
+      : 'none'
+  )
+  documentStyle.setProperty(
+    '--typebot-chat-background-color',
+    chatTheme?.background?.type === BackgroundType.COLOR
+      ? chatTheme.background.content ?? defaultBackgroundColor
+      : 'transparent'
+  )
+  documentStyle.setProperty(
+    '--typebot-chat-background-opacity',
+    String(
+      chatTheme?.background?.type === BackgroundType.IMAGE
+        ? chatTheme.background.opacity ?? 1
+        : 1
+    )
+  )
   setChatContainer(
     chatTheme?.container,
     generalBackground,
@@ -610,6 +636,10 @@ const setGeneralBackground = (
   background: Background | undefined,
   documentStyle: CSSStyleDeclaration
 ) => {
+  documentStyle.setProperty(
+    '--typebot-container-bg-opacity',
+    String(background?.opacity ?? 1)
+  )
   documentStyle.setProperty(cssVariableNames.general.bgImage, null)
   documentStyle.setProperty(cssVariableNames.general.bgColor, null)
   documentStyle.setProperty(

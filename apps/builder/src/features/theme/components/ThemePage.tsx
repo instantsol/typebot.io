@@ -20,6 +20,7 @@ export const ThemePage = () => {
         <Flex flex="1">
           {typebot && (
             <Standard
+              key={typebot.id}
               typebot={typebot}
               style={{
                 width: '100%',

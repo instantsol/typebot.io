@@ -16,6 +16,7 @@ import { useTypebot } from '@/features/editor/providers/TypebotProvider'
 import { ChatThemeSettings } from './chat/ChatThemeSettings'
 import { GeneralSettings } from './general/GeneralSettings'
 import { ThemeTemplates } from './ThemeTemplates'
+import { parseThemeTemplate } from '../helpers/parseThemeTemplate'
 import { defaultSettings } from '@typebot.io/schemas/features/typebot/settings/constants'
 import { useTranslate } from '@tolgee/react'
 
@@ -43,7 +44,7 @@ export const ThemeSideMenu = () => {
     updateTypebot({
       updates: {
         selectedThemeTemplateId: id,
-        theme: theme ? { ...theme } : typebot.theme,
+        theme: theme ? parseThemeTemplate(theme) : typebot.theme,
       },
     })
   }
@@ -106,7 +107,7 @@ export const ThemeSideMenu = () => {
           <AccordionPanel pb={4}>
             {typebot && (
               <GeneralSettings
-                key={templateId}
+                key={`${typebot.id}-${templateId}`}
                 isBrandingEnabled={
                   typebot.settings.general?.isBrandingEnabled ??
                   defaultSettings.general.isBrandingEnabled
@@ -129,7 +130,7 @@ export const ThemeSideMenu = () => {
           <AccordionPanel pb={4}>
             {typebot && (
               <ChatThemeSettings
-                key={templateId}
+                key={`${typebot.id}-${templateId}`}
                 workspaceId={typebot.workspaceId}
                 typebotId={typebot.id}
                 chatTheme={typebot.theme.chat}
@@ -150,7 +151,7 @@ export const ThemeSideMenu = () => {
           <AccordionPanel pb={4}>
             {typebot && (
               <CustomCssSettings
-                key={templateId}
+                key={`${typebot.id}-${templateId}`}
                 customCss={typebot.theme.customCss}
                 onCustomCssChange={updateCustomCss}
               />
