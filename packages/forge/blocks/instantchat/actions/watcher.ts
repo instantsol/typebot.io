@@ -92,16 +92,17 @@ export const watcher = createAction({
                     case -5:
                       const hangupMessage = getHangupMessage()
                       replaceLastElementWith(hangupMessage)
+                      socket.close()
                       break
                     case -4:
                       const chatFrame = getChatFrame(iframeURL)
                       replaceLastElementWith(chatFrame)
+                      socket.close()
                       break
                     default:
                       console.log("Unknown event")
                       break
                   }
-                  socket.close()
                 }
 
                 socket.onclose = (event) => {
