@@ -12,9 +12,21 @@ export const AvatarSideContainer = (props: Props) => {
   let avatarContainer: HTMLDivElement | undefined
   const [top, setTop] = createSignal<number>(0)
 
-  const resizeObserver = new ResizeObserver((entries) =>
-    setTop(entries[0].target.clientHeight - (isMobile() ? 24 : 40))
-  )
+  const resizeObserver = new ResizeObserver((entries) => {
+    const avatarSize = isMobile() ? 24 : 40
+    const isChatWeb = Boolean(
+      avatarContainer?.parentElement?.querySelector(
+        'iframe[src*="/builder_chat/"]'
+      )
+    )
+    const chatWebOffset = isMobile() ? 20 : 12
+
+    setTop(
+      entries[0].target.clientHeight -
+        avatarSize -
+        (isChatWeb ? chatWebOffset : 0)
+    )
+  })
 
   onMount(() => {
     if (avatarContainer) {
