@@ -4,6 +4,7 @@ import { DateInputBlock } from '@typebot.io/schemas'
 import { createSignal } from 'solid-js'
 import { defaultDateInputOptions } from '@typebot.io/schemas/features/blocks/inputs/date/constants'
 import clsx from 'clsx'
+import { replaceEmojiShortcodes } from '@/utils/emojiDict'
 
 type Props = {
   onSubmit: (inputValue: InputSubmitContent) => void
@@ -46,8 +47,10 @@ export const DateForm = (props: Props) => {
           >
             {props.options?.isRange && (
               <p class="font-semibold">
-                {props.options.labels?.from ??
-                  defaultDateInputOptions.labels.from}
+                {replaceEmojiShortcodes(
+                  props.options.labels?.from ??
+                    defaultDateInputOptions.labels.from
+                )}
               </p>
             )}
             <input
@@ -74,8 +77,10 @@ export const DateForm = (props: Props) => {
             <div class="flex items-center p-4">
               {props.options.isRange && (
                 <p class="font-semibold">
-                  {props.options.labels?.to ??
-                    defaultDateInputOptions.labels.to}
+                  {replaceEmojiShortcodes(
+                    props.options.labels?.to ??
+                      defaultDateInputOptions.labels.to
+                  )}
                 </p>
               )}
               <input

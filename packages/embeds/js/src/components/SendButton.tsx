@@ -5,6 +5,7 @@ import { SendIcon } from './icons'
 import { Button } from './Button'
 import { isEmpty } from '@typebot.io/lib'
 import clsx from 'clsx'
+import { replaceEmojiShortcodes } from '@/utils/emojiDict'
 
 type SendButtonProps = {
   isDisabled?: boolean
@@ -15,6 +16,10 @@ type SendButtonProps = {
 
 export const SendButton = (props: SendButtonProps) => {
   const [local, others] = splitProps(props, ['disableIcon'])
+  const renderedChildren = () =>
+    typeof props.children === 'string'
+      ? replaceEmojiShortcodes(props.children)
+      : props.children
   const showIcon =
     (isMobile() && !local.disableIcon) ||
     !props.children ||
@@ -34,7 +39,7 @@ export const SendButton = (props: SendButtonProps) => {
             }
           />
         </Match>
-        <Match when={!showIcon}>{props.children}</Match>
+        <Match when={!showIcon}>{renderedChildren()}</Match>
       </Switch>
     </Button>
   )

@@ -7,6 +7,7 @@ import { isDefined, isEmpty, isNotEmpty, isSvgSrc } from '@typebot.io/lib'
 import { SearchInput } from '@/components/inputs/SearchInput'
 import { isMobile } from '@/utils/isMobileSignal'
 import { defaultPictureChoiceOptions } from '@typebot.io/schemas/features/blocks/inputs/pictureChoice/constants'
+import { replaceEmojiShortcodes } from '@/utils/emojiDict'
 
 type Props = {
   defaultItems: PictureChoiceBlock['items']
@@ -122,7 +123,11 @@ export const MultiplePictureChoice = (props: Props) => {
             >
               <img
                 src={item.pictureSrc}
-                alt={item.title ?? `Picture ${index() + 1}`}
+                alt={
+                  item.title
+                    ? replaceEmojiShortcodes(item.title)
+                    : `Picture ${index() + 1}`
+                }
                 elementtiming={`Picture choice ${index() + 1}`}
                 fetchpriority={'high'}
                 class="m-auto"
@@ -148,11 +153,13 @@ export const MultiplePictureChoice = (props: Props) => {
                 <Show when={item.title || item.description}>
                   <div class="flex flex-col gap-1 ">
                     <Show when={item.title}>
-                      <span class="font-semibold">{item.title}</span>
+                      <span class="font-semibold">
+                        {replaceEmojiShortcodes(item.title ?? '')}
+                      </span>
                     </Show>
                     <Show when={item.description}>
                       <span class="text-sm whitespace-pre-wrap text-left">
-                        {item.description}
+                        {replaceEmojiShortcodes(item.description ?? '')}
                       </span>
                     </Show>
                   </div>
@@ -186,7 +193,11 @@ export const MultiplePictureChoice = (props: Props) => {
                   props.defaultItems.find((item) => item.id === selectedItem.id)
                     ?.pictureSrc
                 }
-                alt={selectedItem.title ?? `Selected picture ${index() + 1}`}
+                alt={
+                  selectedItem.title
+                    ? replaceEmojiShortcodes(selectedItem.title)
+                    : `Selected picture ${index() + 1}`
+                }
                 elementtiming={`Selected picture choice ${index() + 1}`}
                 fetchpriority={'high'}
               />
@@ -213,11 +224,13 @@ export const MultiplePictureChoice = (props: Props) => {
                 <Show when={selectedItem.title || selectedItem.description}>
                   <div class="flex flex-col gap-1 ">
                     <Show when={selectedItem.title}>
-                      <span class="font-semibold">{selectedItem.title}</span>
+                      <span class="font-semibold">
+                        {replaceEmojiShortcodes(selectedItem.title ?? '')}
+                      </span>
                     </Show>
                     <Show when={selectedItem.description}>
                       <span class="text-sm whitespace-pre-wrap text-left">
-                        {selectedItem.description}
+                        {replaceEmojiShortcodes(selectedItem.description ?? '')}
                       </span>
                     </Show>
                   </div>

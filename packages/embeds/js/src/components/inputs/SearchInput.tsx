@@ -1,6 +1,7 @@
 import { Show, createSignal, splitProps } from 'solid-js'
 import { JSX } from 'solid-js/jsx-runtime'
 import { CloseIcon } from '../icons/CloseIcon'
+import { replaceEmojiShortcodes } from '@/utils/emojiDict'
 
 type Props = {
   ref: HTMLInputElement | undefined
@@ -10,7 +11,7 @@ type Props = {
 
 export const SearchInput = (props: Props) => {
   const [value, setValue] = createSignal('')
-  const [local, others] = splitProps(props, ['onInput', 'ref'])
+  const [local, others] = splitProps(props, ['onInput', 'ref', 'placeholder'])
 
   const changeValue = (value: string) => {
     setValue(value)
@@ -31,6 +32,11 @@ export const SearchInput = (props: Props) => {
         style={{ 'font-size': '16px' }}
         value={value()}
         onInput={(e) => changeValue(e.currentTarget.value)}
+        placeholder={
+          typeof local.placeholder === 'string'
+            ? replaceEmojiShortcodes(local.placeholder)
+            : local.placeholder
+        }
         {...others}
       />
       <Show when={value().length > 0}>
