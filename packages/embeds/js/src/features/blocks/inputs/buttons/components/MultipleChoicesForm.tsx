@@ -6,6 +6,7 @@ import { createSignal, For, onMount, Show } from 'solid-js'
 import { Checkbox } from './Checkbox'
 import { SearchInput } from '@/components/inputs/SearchInput'
 import { defaultChoiceInputOptions } from '@typebot.io/schemas/features/blocks/inputs/choice/constants'
+import { replaceEmojiShortcodes } from '@/utils/emojiDict'
 
 type Props = {
   defaultItems: ChoiceInputBlock['items']
@@ -105,7 +106,7 @@ export const MultipleChoicesForm = (props: Props) => {
                     )}
                     class="flex-shrink-0"
                   />
-                  <span>{item.content}</span>
+                  <span>{replaceEmojiShortcodes(item.content ?? '')}</span>
                 </div>
               </div>
             </span>
@@ -130,11 +131,11 @@ export const MultipleChoicesForm = (props: Props) => {
                 <div class="flex items-center gap-2">
                   <Checkbox isChecked />
                   <span>
-                    {
+                    {replaceEmojiShortcodes(
                       props.defaultItems.find(
                         (item) => item.id === selectedItemId
-                      )?.content
-                    }
+                      )?.content ?? ''
+                    )}
                   </span>
                 </div>
               </div>

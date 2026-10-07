@@ -1,5 +1,6 @@
 import { splitProps } from 'solid-js'
 import { JSX } from 'solid-js/jsx-runtime'
+import { replaceEmojiShortcodes } from '@/utils/emojiDict'
 
 type ShortTextInputProps = {
   ref: HTMLInputElement | undefined
@@ -7,7 +8,7 @@ type ShortTextInputProps = {
 } & Omit<JSX.InputHTMLAttributes<HTMLInputElement>, 'onInput'>
 
 export const ShortTextInput = (props: ShortTextInputProps) => {
-  const [local, others] = splitProps(props, ['ref', 'onInput'])
+  const [local, others] = splitProps(props, ['ref', 'onInput', 'placeholder'])
 
   return (
     <input
@@ -16,6 +17,11 @@ export const ShortTextInput = (props: ShortTextInputProps) => {
       type="text"
       style={{ 'font-size': '16px' }}
       onInput={(e) => local.onInput(e.currentTarget.value)}
+      placeholder={
+        typeof local.placeholder === 'string'
+          ? replaceEmojiShortcodes(local.placeholder)
+          : local.placeholder
+      }
       {...others}
     />
   )

@@ -4,6 +4,7 @@ import { isMobile } from '@/utils/isMobileSignal'
 import { isDefined, isNotEmpty, isSvgSrc } from '@typebot.io/lib/utils'
 import { PictureChoiceBlock } from '@typebot.io/schemas/features/blocks/inputs/pictureChoice'
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js'
+import { replaceEmojiShortcodes } from '@/utils/emojiDict'
 
 type Props = {
   defaultItems: PictureChoiceBlock['items']
@@ -87,7 +88,11 @@ export const SinglePictureChoice = (props: Props) => {
             >
               <img
                 src={item.pictureSrc}
-                alt={item.title ?? `Picture ${index() + 1}`}
+                alt={
+                  item.title
+                    ? replaceEmojiShortcodes(item.title)
+                    : `Picture ${index() + 1}`
+                }
                 elementtiming={`Picture choice ${index() + 1}`}
                 fetchpriority={'high'}
                 class="m-auto"
@@ -99,9 +104,11 @@ export const SinglePictureChoice = (props: Props) => {
                   (item.description ? ' items-start' : '')
                 }
               >
-                <span class="font-semibold">{item.title}</span>
+                <span class="font-semibold">
+                  {replaceEmojiShortcodes(item.title ?? '')}
+                </span>
                 <span class="text-sm whitespace-pre-wrap text-left">
-                  {item.description}
+                  {replaceEmojiShortcodes(item.description ?? '')}
                 </span>
               </div>
             </button>

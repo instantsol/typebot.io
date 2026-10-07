@@ -1,6 +1,7 @@
 import { isMobile } from '@/utils/isMobileSignal'
 import { splitProps } from 'solid-js'
 import { JSX } from 'solid-js/jsx-runtime'
+import { replaceEmojiShortcodes } from '@/utils/emojiDict'
 
 type TextareaProps = {
   ref: HTMLTextAreaElement | undefined
@@ -8,7 +9,7 @@ type TextareaProps = {
 } & Omit<JSX.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onInput'>
 
 export const Textarea = (props: TextareaProps) => {
-  const [local, others] = splitProps(props, ['ref', 'onInput'])
+  const [local, others] = splitProps(props, ['ref', 'onInput', 'placeholder'])
 
   return (
     <textarea
@@ -20,6 +21,11 @@ export const Textarea = (props: TextareaProps) => {
       style={{ 'font-size': '16px' }}
       autofocus={!isMobile()}
       onInput={(e) => local.onInput(e.currentTarget.value)}
+      placeholder={
+        typeof local.placeholder === 'string'
+          ? replaceEmojiShortcodes(local.placeholder)
+          : local.placeholder
+      }
       {...others}
     />
   )
