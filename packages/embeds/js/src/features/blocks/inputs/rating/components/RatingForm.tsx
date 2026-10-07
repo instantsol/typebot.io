@@ -5,6 +5,7 @@ import { createSignal, For, Match, Switch, Show } from 'solid-js'
 import { isDefined, isEmpty, isNotDefined } from '@typebot.io/lib'
 import { Button } from '@/components/Button'
 import { defaultRatingInputOptions } from '@typebot.io/schemas/features/blocks/inputs/rating/constants'
+import { replaceEmojiShortcodes } from '@/utils/emojiDict'
 
 type Props = {
   block: RatingInputBlock
@@ -34,7 +35,7 @@ export const RatingForm = (props: Props) => {
     <form class="flex flex-col gap-2" onSubmit={handleSubmit}>
       {props.block.options?.labels?.left && (
         <span class="text-sm w-full rating-label">
-          {props.block.options.labels.left}
+          {replaceEmojiShortcodes(props.block.options.labels.left)}
         </span>
       )}
       <div class="flex flex-wrap justify-center gap-2">
@@ -72,7 +73,7 @@ export const RatingForm = (props: Props) => {
       </div>
       {props.block.options?.labels?.right && (
         <span class="text-sm w-full text-right pr-2 rating-label">
-          {props.block.options.labels.right}
+          {replaceEmojiShortcodes(props.block.options.labels.right)}
         </span>
       )}
 

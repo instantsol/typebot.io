@@ -11,6 +11,7 @@ import { isDefined } from '@typebot.io/lib'
 import { SelectedFile } from './SelectedFile'
 import { sanitizeNewFile } from '../helpers/sanitizeSelectedFiles'
 import { toaster } from '@/utils/toaster'
+import { replaceEmojiShortcodes } from '@/utils/emojiDict'
 
 type Props = {
   context: BotContext
@@ -201,10 +202,10 @@ export const FileUploadForm = (props: Props) => {
                 </Show>
                 <p
                   class="text-sm text-gray-500 text-center"
-                  innerHTML={
+                  innerHTML={replaceEmojiShortcodes(
                     props.block.options?.labels?.placeholder ??
-                    defaultFileInputOptions.labels.placeholder
-                  }
+                      defaultFileInputOptions.labels.placeholder
+                  )}
                 />
               </div>
               <input

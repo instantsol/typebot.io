@@ -1,5 +1,6 @@
 import { isEmpty } from '@typebot.io/lib'
 import { Show } from 'solid-js'
+import { replaceEmojiShortcodes } from '@/utils/emojiDict'
 
 export type PlateTextProps = {
   text: string
@@ -23,7 +24,7 @@ const computeClassNames = (
 
 export const PlateText = (props: PlateTextProps) => (
   <span class={computeClassNames(props.bold, props.italic, props.underline)}>
-    {props.text}
+    {replaceEmojiShortcodes(props.text)}
     <Show when={props.isUniqueChild && isEmpty(props.text)}>
       <br />
     </Show>

@@ -6,6 +6,7 @@ import { Modal } from '../Modal'
 import { isNotEmpty } from '@typebot.io/lib'
 import { FilePreview } from '@/features/blocks/inputs/fileUpload/components/FilePreview'
 import clsx from 'clsx'
+import { replaceEmojiShortcodes } from '@/utils/emojiDict'
 
 type Props = {
   message: Answer
@@ -82,7 +83,9 @@ export const GuestBubble = (props: Props) => {
           data-testid="guest-bubble"
         >
           <Show when={isNotEmpty(props.message.text)}>
-            <span class="px-[15px] py-[7px]">{props.message.text}</span>
+            <span class="px-[15px] py-[7px]">
+              {replaceEmojiShortcodes(props.message.text)}
+            </span>
           </Show>
         </div>
       </div>
