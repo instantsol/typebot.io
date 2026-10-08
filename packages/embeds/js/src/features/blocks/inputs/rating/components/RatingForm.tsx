@@ -7,6 +7,7 @@ import { Button } from '@/components/Button'
 import { defaultRatingInputOptions } from '@typebot.io/schemas/features/blocks/inputs/rating/constants'
 import { TextBubble } from '@/features/blocks/bubbles/textBubble'
 import { TextBubbleBlock } from '@typebot.io/schemas'
+import { replaceEmojiShortcodes } from '@/utils/emojiDict'
 
 type Props = {
   block: RatingInputBlock
@@ -58,7 +59,7 @@ export const RatingForm = (props: Props) => {
       )}
       {props.block.options?.labels?.left && (
         <span class="text-sm w-full rating-label">
-          {props.block.options.labels.left}
+          {replaceEmojiShortcodes(props.block.options.labels.left)}
         </span>
       )}
       <div class="flex flex-wrap justify-center gap-2">
@@ -96,7 +97,7 @@ export const RatingForm = (props: Props) => {
       </div>
       {props.block.options?.labels?.right && (
         <span class="text-sm w-full text-right pr-2 rating-label">
-          {props.block.options.labels.right}
+          {replaceEmojiShortcodes(props.block.options.labels.right)}
         </span>
       )}
 

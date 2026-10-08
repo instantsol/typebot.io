@@ -6,6 +6,7 @@ import type { NumberInputBlock } from '@typebot.io/schemas'
 import { createSignal, onCleanup, onMount } from 'solid-js'
 import { numberInputHelper } from '../numberInputHelper'
 import { defaultNumberInputOptions } from '@typebot.io/schemas/features/blocks/inputs/number/constants'
+import { replaceEmojiShortcodes } from '@/utils/emojiDict'
 
 type NumberInputProps = {
   block: NumberInputBlock
@@ -64,10 +65,10 @@ export const NumberInput = (props: NumberInputProps) => {
           // @ts-expect-error not defined
           // eslint-disable-next-line solid/jsx-no-undef
           use:bindValue
-          placeholder={
+          placeholder={replaceEmojiShortcodes(
             props.block.options?.labels?.placeholder ??
-            defaultNumberInputOptions.labels.placeholder
-          }
+              defaultNumberInputOptions.labels.placeholder
+          )}
           onInput={(e) => {
             setInputValue(targetValue(e.currentTarget))
           }}

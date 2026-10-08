@@ -1,5 +1,6 @@
 import { children, JSX, Show, splitProps } from 'solid-js'
 import { Spinner } from './Spinner'
+import { replaceEmojiShortcodes } from '@/utils/emojiDict'
 
 type Props = {
   variant?: 'primary' | 'secondary'
@@ -11,6 +12,10 @@ type Props = {
 export const Button = (props: Props) => {
   const childrenReturn = children(() => props.children)
   const [local, buttonProps] = splitProps(props, ['disabled', 'class'])
+  const renderedChildren = () => {
+    const value = childrenReturn()
+    return typeof value === 'string' ? replaceEmojiShortcodes(value) : value
+  }
 
   return (
     <button
@@ -26,7 +31,7 @@ export const Button = (props: Props) => {
       }
     >
       <Show when={!props.isLoading} fallback={<Spinner />}>
-        {childrenReturn()}
+        {renderedChildren()}
       </Show>
     </button>
   )

@@ -9,6 +9,7 @@ import {
   setPaymentInProgressInStorage,
 } from '../helpers/paymentInProgressStorage'
 import { defaultPaymentInputOptions } from '@typebot.io/schemas/features/blocks/inputs/payment/constants'
+import { replaceEmojiShortcodes } from '@/utils/emojiDict'
 
 type Props = {
   context: BotContext
@@ -108,9 +109,11 @@ export const StripePaymentForm = (props: Props) => {
           class="mt-4 w-full max-w-lg animate-fade-in"
           disableIcon
         >
-          {props.options?.labels?.button ??
-            defaultPaymentInputOptions.labels.button}{' '}
-          {props.options?.amountLabel}
+          {replaceEmojiShortcodes(
+            props.options?.labels?.button ??
+              defaultPaymentInputOptions.labels.button
+          )}{' '}
+          {replaceEmojiShortcodes(props.options?.amountLabel ?? '')}
         </SendButton>
       </Show>
 
