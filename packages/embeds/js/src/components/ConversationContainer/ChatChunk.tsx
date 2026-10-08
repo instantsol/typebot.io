@@ -6,6 +6,7 @@ import { HostBubble } from '../bubbles/HostBubble'
 import { InputChatBlock } from '../InputChatBlock'
 import { AvatarSideContainer } from './AvatarSideContainer'
 import { StreamingBubble } from '../bubbles/StreamingBubble'
+import { GuestBubble } from '../bubbles/GuestBubble'
 import { defaultSettings } from '@typebot.io/schemas/features/typebot/settings/constants'
 import {
   defaultGuestAvatarIsEnabled,
@@ -30,18 +31,55 @@ type Props = Pick<ContinueChatResponse, 'messages' | 'input'> & {
 
 export const ChatChunk = (props: Props) => {
   let inputRef: HTMLDivElement | undefined
+
   const [displayedMessageIndex, setDisplayedMessageIndex] = createSignal(
     props.isTransitionDisabled ? props.messages.length : 0
   )
+
   const [lastBubble, setLastBubble] = createSignal<HTMLDivElement>()
 
-  onMount(() => {
-    if (props.streamingMessageId) return
-    if (props.messages.length === 0) {
-      props.onAllBubblesDisplayed()
+  /**
+   * Detect our custom historical guest message.
+   *
+   * Backend format:
+   *
+   * {
+   *   id: "...",
+   *   type: "guest",
+   *   answer: {
+   *     text: "...",
+   *     attachments: []
+   *   }
+   * }
+   */
+  const getHistoricalGuestAnswer = (message: unknown): Answer | undefined => {
+    if (
+      typeof message === 'object' &&
+      message !== null &&
+      'type' in message &&
+      (message as { type?: unknown }).type === 'guest' &&
+      'answer' in message
+    ) {
+      const answer = (message as { answer?: unknown }).answer
+
+      if (typeof answer === 'object' && answer !== null && 'text' in answer) {
+        return answer as Answer
+      }
     }
-    props.onScrollToBottom(inputRef, 50)
-  })
+
+    return undefined
+  }
+
+  /**
+   * Historical messages are rendered immediately.
+   *
+   * We don't want the historical transcript to participate in
+   * Typebot's normal bubble transition mechanism.
+   */
+  const hasHistoricalMessages = () =>
+    props.messages.some(
+      (message) => getHistoricalGuestAnswer(message) !== undefined
+    )
 
   const displayNextMessage = async (bubbleRef?: HTMLDivElement) => {
     if (
@@ -57,19 +95,41 @@ export const ChatChunk = (props: Props) => {
         )
       )
     }
+
     const lastBubbleBlockId = props.messages[displayedMessageIndex()].id
+
     await props.onNewBubbleDisplayed(lastBubbleBlockId)
-    setDisplayedMessageIndex(
+
+    const nextIndex =
       displayedMessageIndex() === props.messages.length
         ? displayedMessageIndex()
         : displayedMessageIndex() + 1
-    )
+
+    setDisplayedMessageIndex(nextIndex)
+
     props.onScrollToBottom(bubbleRef)
-    if (displayedMessageIndex() === props.messages.length) {
+
+    if (nextIndex === props.messages.length) {
       setLastBubble(bubbleRef)
       props.onAllBubblesDisplayed()
     }
   }
+
+  onMount(() => {
+    if (props.streamingMessageId) return
+
+    /**
+     * If this is restored history, show the complete transcript
+     * immediately instead of waiting for HostBubble transitions.
+     */
+    if (hasHistoricalMessages()) {
+      setDisplayedMessageIndex(props.messages.length)
+    } else if (props.messages.length === 0) {
+      props.onAllBubblesDisplayed()
+    }
+
+    props.onScrollToBottom(inputRef, 50)
+  })
 
   return (
     <div class="flex flex-col w-full min-w-0 gap-2 typebot-chat-chunk">
@@ -85,7 +145,9 @@ export const ChatChunk = (props: Props) => {
             <AvatarSideContainer
               hostAvatarSrc={props.theme.chat?.hostAvatar?.url}
               hideAvatar={props.hideAvatar}
-              isTransitionDisabled={props.isTransitionDisabled}
+              isTransitionDisabled={
+                props.isTransitionDisabled || hasHistoricalMessages()
+              }
             />
           </Show>
 
@@ -102,27 +164,53 @@ export const ChatChunk = (props: Props) => {
             }}
           >
             <For each={props.messages.slice(0, displayedMessageIndex() + 1)}>
-              {(message, idx) => (
-                <HostBubble
-                  message={message}
-                  typingEmulation={props.settings.typingEmulation}
-                  isTypingSkipped={
-                    (props.settings.typingEmulation?.isDisabledOnFirstMessage ??
-                      defaultSettings.typingEmulation
-                        .isDisabledOnFirstMessage) &&
-                    props.index === 0 &&
-                    idx() === 0
-                  }
-                  onTransitionEnd={
-                    props.isTransitionDisabled ? undefined : displayNextMessage
-                  }
-                  onCompleted={props.onSubmit}
-                />
-              )}
+              {(message, idx) => {
+                const guestAnswer = getHistoricalGuestAnswer(message)
+
+                return (
+                  <Show
+                    when={guestAnswer}
+                    fallback={
+                      <HostBubble
+                        message={message}
+                        typingEmulation={props.settings.typingEmulation}
+                        isTypingSkipped={
+                          (props.settings.typingEmulation
+                            ?.isDisabledOnFirstMessage ??
+                            defaultSettings.typingEmulation
+                              .isDisabledOnFirstMessage) &&
+                          props.index === 0 &&
+                          idx() === 0
+                        }
+                        onTransitionEnd={
+                          props.isTransitionDisabled || hasHistoricalMessages()
+                            ? undefined
+                            : displayNextMessage
+                        }
+                        onCompleted={props.onSubmit}
+                      />
+                    }
+                  >
+                    <GuestBubble
+                      message={guestAnswer!}
+                      showAvatar={
+                        props.theme.chat?.guestAvatar?.isEnabled ??
+                        defaultGuestAvatarIsEnabled
+                      }
+                      avatarSrc={props.theme.chat?.guestAvatar?.url}
+                      hasHostAvatar={
+                        props.theme.chat?.hostAvatar?.isEnabled ??
+                        defaultHostAvatarIsEnabled
+                      }
+                    />
+                  </Show>
+                )
+              }}
             </For>
           </div>
         </div>
       </Show>
+
       {props.input && displayedMessageIndex() === props.messages.length && (
         <InputChatBlock
           ref={inputRef}
@@ -144,6 +232,7 @@ export const ChatChunk = (props: Props) => {
           onSkip={props.onSkip}
         />
       )}
+
       <Show when={props.streamingMessageId} keyed>
         {(streamingMessageId) => (
           <div class={'flex' + (isMobile() ? ' gap-1' : ' gap-2')}>
