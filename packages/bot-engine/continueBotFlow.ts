@@ -199,9 +199,17 @@ export const continueBotFlow = async (
 
   const groupHasMoreBlocks = blockIndex < group.blocks.length - 1
 
-  const { edgeId: nextEdgeId, isOffDefaultPath } = getOutgoingEdgeId(
+  const { edgeId: outgoingEdgeId, isOffDefaultPath } = getOutgoingEdgeId(
     newSessionState
   )(block, formattedReply)
+
+  // The builder can leave a stale outgoingEdgeId on a block whose edge was
+  // already deleted. Treat it as no edge so the rest of the group still runs.
+  const nextEdgeId = newSessionState.typebotsQueue[0].typebot.edges.some(
+    byId(outgoingEdgeId)
+  )
+    ? outgoingEdgeId
+    : undefined
 
   if (groupHasMoreBlocks && !nextEdgeId) {
     const chatReply = await executeGroup(

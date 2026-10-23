@@ -6,7 +6,7 @@ import {
   SessionState,
   SetVariableHistoryItem,
 } from '@typebot.io/schemas'
-import { isEmpty, isNotEmpty } from '@typebot.io/lib'
+import { byId, isEmpty, isNotEmpty } from '@typebot.io/lib'
 import {
   isBubbleBlock,
   isInputBlock,
@@ -298,7 +298,15 @@ export const executeGroup = async (
       }
     }
 
-    if (executionResponse.outgoingEdgeId) {
+    // Skip a stale outgoingEdgeId left by the builder (edge already deleted)
+    // so the rest of the group still runs. Portal edges (jump / typebot link)
+    // are already added to newSessionState above.
+    if (
+      executionResponse.outgoingEdgeId &&
+      newSessionState.typebotsQueue[0].typebot.edges.some(
+        byId(executionResponse.outgoingEdgeId)
+      )
+    ) {
       isNextEdgeOffDefaultPath =
         block.outgoingEdgeId !== executionResponse.outgoingEdgeId
       nextEdgeId = executionResponse.outgoingEdgeId
