@@ -87,6 +87,7 @@ export const continueBotFlow = async (
     })
 
   let variableToUpdate: Variable | undefined
+  let mappedVariablesToUpdate: Variable[] = []
 
   if (block.type === LogicBlockType.SET_VARIABLE) {
     const existingVariable = state.typebotsQueue[0].typebot.variables.find(
@@ -143,6 +144,29 @@ export const continueBotFlow = async (
               )
           )
         }
+
+        const saveVariablesMapping =
+          action.run?.web?.displayEmbedBubble?.waitForEvent?.getSaveVariablesMapping?.(
+            options
+          )
+        const parsedReply = safeJsonParse(reply.text)
+        if (
+          saveVariablesMapping &&
+          parsedReply &&
+          typeof parsedReply === 'object' &&
+          !Array.isArray(parsedReply)
+        ) {
+          mappedVariablesToUpdate = saveVariablesMapping.flatMap(
+            ({ key, variableId }) => {
+              const existingVariable = state.typebotsQueue[0].typebot.variables.find(
+                byId(variableId)
+              )
+              const value = (parsedReply as Record<string, unknown>)[key]
+              if (!existingVariable || !isDefined(value)) return []
+              return [{ ...existingVariable, value: String(value) }]
+            }
+          )
+        }
       }
     }
   } else if (
@@ -164,6 +188,16 @@ export const continueBotFlow = async (
           value: reply?.text ? safeJsonParse(reply?.text) : undefined,
         },
       ],
+    })
+    newSessionState = updatedState
+    setVariableHistory.push(...newSetVariableHistory)
+  }
+
+  if (mappedVariablesToUpdate.length > 0) {
+    const { newSetVariableHistory, updatedState } = updateVariablesInSession({
+      state: newSessionState,
+      currentBlockId: block.id,
+      newVariables: mappedVariablesToUpdate,
     })
     newSessionState = updatedState
     setVariableHistory.push(...newSetVariableHistory)
