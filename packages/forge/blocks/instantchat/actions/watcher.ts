@@ -1,17 +1,17 @@
-import { createAction, option } from "@typebot.io/forge"
-import { baseOptions } from "../baseOptions"
+import { createAction, option } from '@typebot.io/forge'
+import { baseOptions } from '../baseOptions'
 
 export const watcher = createAction({
-  name: "Watcher",
+  name: 'Watcher',
   baseOptions,
   options: option.object({}),
   getSetVariableIds: ({}) => [],
   run: {
     web: {
       displayEmbedBubble: {
-        parseUrl: ({}) => "",
+        parseUrl: ({}) => '',
         waitForEvent: {
-          getSaveVariableId: ({}) => "",
+          getSaveVariableId: ({}) => '',
           parseFunction: () => {
             return {
               args: {},
@@ -25,7 +25,7 @@ export const watcher = createAction({
           const { baseUrl } = credentials
           const hash = variables
             .list()
-            .find((v) => v.name === "is_contactid")?.value
+            .find((v) => v.name === 'is_contactid')?.value
           const domain = new URL(baseUrl).hostname
           const socketURL = `wss://${domain}/chat/ws/chat/${hash}/`
           const iframeURL = `https://${domain}/builder_chat/${hash}/`
@@ -89,7 +89,7 @@ export const watcher = createAction({
                   }
 
                   switch (data.user) {
-                    case -5:
+                    case -7:
                       const hangupMessage = getHangupMessage()
                       replaceLastElementWith(hangupMessage)
                       socket.close()
