@@ -85,6 +85,12 @@ export type ActionDefinition<
           getSaveVariableId?: (
             options: z.infer<BaseOptions> & z.infer<Options>
           ) => string | undefined
+          /**
+           * Used to save keys of a JSON object reply into several variables.
+           */
+          getSaveVariablesMapping?: (
+            options: z.infer<BaseOptions> & z.infer<Options>
+          ) => { key: string; variableId?: string }[]
           parseFunction: (params: {
             options: z.infer<BaseOptions> & z.infer<Options>
             variables: VariableStore
