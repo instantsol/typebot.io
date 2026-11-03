@@ -6,6 +6,6 @@
   "dependencies": {
     "@typebot.io/lib": "workspace:*",
     "@typebot.io/tsconfig": "workspace:*",
-    "isolated-vm": "5.0.1"
+    "isolated-vm": "7.0.1"
   }
 }
