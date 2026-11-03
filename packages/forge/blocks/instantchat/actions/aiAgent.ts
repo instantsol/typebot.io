@@ -17,7 +17,17 @@ export const aiAgent = createAction({
       withVariableButton: true,
       defaultValue: 'Se apresente, cumprimente e ofereça assitência.',
     }),
+    intentMapping: option.string.layout({
+      label: 'Salvar intenção',
+      inputType: 'variableDropdown',
+    }),
+    destinationMapping: option.string.layout({
+      label: 'Salvar destino',
+      inputType: 'variableDropdown',
+    }),
   }),
+  getSetVariableIds: ({ intentMapping, destinationMapping }) =>
+    [intentMapping, destinationMapping].filter(isDefined),
   run: {
     server: async ({
       options: { aiAgent, startMessage },
@@ -58,6 +68,11 @@ export const aiAgent = createAction({
         parseUrl: ({}) => '',
         waitForEvent: {
           getSaveVariableId: () => undefined,
+          // ivci replies with {"type": "#TRANSFERIR_BOT", "value": "<destination>"}
+          getSaveVariablesMapping: ({ intentMapping, destinationMapping }) => [
+            { key: 'type', variableId: intentMapping },
+            { key: 'value', variableId: destinationMapping },
+          ],
           parseFunction: () => {
             return {
               args: {},
