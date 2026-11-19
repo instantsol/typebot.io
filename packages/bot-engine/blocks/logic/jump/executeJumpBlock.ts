@@ -1,4 +1,4 @@
-import { addEdgeToTypebot, createPortalEdge } from '../../../addEdgeToTypebot'
+import { getOrAddPortalEdge } from '../../../addEdgeToTypebot'
 import { ExecuteLogicResponse } from '../../../types'
 import { TRPCError } from '@trpc/server'
 import { SessionState } from '@typebot.io/schemas'
@@ -21,10 +21,10 @@ export const executeJumpBlock = (
       message: 'Block to jump to is not found',
     })
 
-  const portalEdge = createPortalEdge({
-    to: { groupId, blockId: blockToJumpTo?.id },
+  const { edgeId, newSessionState } = getOrAddPortalEdge(state, {
+    groupId,
+    blockId: blockToJumpTo?.id,
   })
-  const newSessionState = addEdgeToTypebot(state, portalEdge)
 
-  return { outgoingEdgeId: portalEdge.id, newSessionState }
+  return { outgoingEdgeId: edgeId, newSessionState }
 }

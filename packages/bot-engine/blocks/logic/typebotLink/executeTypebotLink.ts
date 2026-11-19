@@ -1,4 +1,4 @@
-import { addEdgeToTypebot, createPortalEdge } from '../../../addEdgeToTypebot'
+import { getOrAddPortalEdge } from '../../../addEdgeToTypebot'
 import {
   TypebotLinkBlock,
   SessionState,
@@ -59,13 +59,13 @@ export const executeTypebotLink = async (
     return { outgoingEdgeId: block.outgoingEdgeId, logs }
   }
 
-  const portalEdge = createPortalEdge({ to: { groupId: nextGroupId } })
-
-  newSessionState = addEdgeToTypebot(newSessionState, portalEdge)
+  const portalEdge = getOrAddPortalEdge(newSessionState, {
+    groupId: nextGroupId,
+  })
 
   return {
-    outgoingEdgeId: portalEdge.id,
-    newSessionState,
+    outgoingEdgeId: portalEdge.edgeId,
+    newSessionState: portalEdge.newSessionState,
   }
 }
 
