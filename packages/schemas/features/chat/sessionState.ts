@@ -96,6 +96,11 @@ const sessionStateSchemaV3 = sessionStateSchemaV2
         consecutiveErrorCount: z.number(),
       })
       .optional(),
+    noInputLoopMetadata: z
+      .object({
+        blockVisitCounts: z.record(z.string(), z.number()),
+      })
+      .optional(),
     previewMetadata: z
       .object({
         answers: z.array(answerSchema).optional(),

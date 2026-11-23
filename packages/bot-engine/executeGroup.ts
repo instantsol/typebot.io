@@ -43,6 +43,12 @@ const WEBHOOK_TIMEOUT_LOOP_FORCED_STOP_MESSAGE =
   'Bot stopped automatically: webhook timeout loop detected'
 const CONSECUTIVE_ERROR_LOOP_FORCED_STOP_MESSAGE =
   'Bot stopped automatically: consecutive error loop detected'
+// Max times the same block may run without the user answering an input in
+// between (counted across continueChat calls). Catches loops that never error,
+// e.g. a webhook returning 200 with a business failure that jumps back to retry.
+const NO_INPUT_BLOCK_VISIT_LIMIT = 500
+const NO_INPUT_LOOP_FORCED_STOP_MESSAGE =
+  'Bot stopped automatically: loop without user input detected'
 
 type ContextProps = {
   version: 1 | 2
@@ -89,6 +95,29 @@ export const executeGroup = async (
 
   let isNextEdgeOffDefaultPath = false
   let index = -1
+
+  const trackBlockVisitOrStop = (blockId: string) => {
+    const visit = trackNoInputBlockVisit(newSessionState, blockId)
+    if (visit.visitCount > NO_INPUT_BLOCK_VISIT_LIMIT)
+      return stopCurrentRun({
+        messages,
+        newSessionState,
+        clientSideActions,
+        logs,
+        visitedEdges,
+        setVariableHistory,
+        description: NO_INPUT_LOOP_FORCED_STOP_MESSAGE,
+        details: {
+          reason: `Forced stop because block ${blockId} (group "${group.title}") ran more than ${NO_INPUT_BLOCK_VISIT_LIMIT} times without user input.`,
+          blockId,
+          groupId: group.id,
+          visitCount: visit.visitCount,
+          limit: NO_INPUT_BLOCK_VISIT_LIMIT,
+        },
+      })
+    newSessionState = visit.newSessionState
+  }
+
   for (const block of group.blocks) {
     if (
       newStartTime &&
@@ -116,6 +145,8 @@ export const executeGroup = async (
 
     if (isBubbleBlock(block)) {
       if (!block.content || (firstBubbleWasStreamed && index === 0)) continue
+      const bubbleLoopStop = trackBlockVisitOrStop(block.id)
+      if (bubbleLoopStop) return bubbleLoopStop
       const message = parseBubbleBlock(block as BubbleBlockWithDefinedContent, {
         version,
         variables: newSessionState.typebotsQueue[0].typebot.variables,
@@ -185,6 +216,11 @@ export const executeGroup = async (
         setVariableHistory,
         lastBubbleBlockId,
       })
+    }
+
+    if (isLogicBlock(block) || isIntegrationBlock(block)) {
+      const blockLoopStop = trackBlockVisitOrStop(block.id)
+      if (blockLoopStop) return blockLoopStop
     }
 
     const executionResponse = (
@@ -379,6 +415,20 @@ const getCurrentRunWebhookTimeoutCount = (logs: ContinueChatResponse['logs']) =>
 const hasExceededConsecutiveErrorLimit = (state: SessionState) =>
   (state.errorLoopMetadata?.consecutiveErrorCount ?? 0) >=
   CONSECUTIVE_ERROR_LIMIT
+
+const trackNoInputBlockVisit = (state: SessionState, blockId: string) => {
+  const blockVisitCounts = state.noInputLoopMetadata?.blockVisitCounts ?? {}
+  const visitCount = (blockVisitCounts[blockId] ?? 0) + 1
+  return {
+    visitCount,
+    newSessionState: {
+      ...state,
+      noInputLoopMetadata: {
+        blockVisitCounts: { ...blockVisitCounts, [blockId]: visitCount },
+      },
+    } satisfies SessionState,
+  }
+}
 
 const updateConsecutiveErrorCount = (
   state: SessionState,

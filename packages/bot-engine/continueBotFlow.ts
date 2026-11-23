@@ -229,6 +229,8 @@ export const continueBotFlow = async (
         ? { ...reply, type: 'text', text: formattedReply }
         : undefined
     )
+    // The user answered an input: the no-input loop guard starts over.
+    newSessionState = { ...newSessionState, noInputLoopMetadata: undefined }
   }
 
   const groupHasMoreBlocks = blockIndex < group.blocks.length - 1

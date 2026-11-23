@@ -5,6 +5,7 @@ export const resetSessionState = (state: SessionState): SessionState => ({
   currentSetVariableHistoryIndex: undefined,
   currentVisitedEdgeIndex: undefined,
   errorLoopMetadata: undefined,
+  noInputLoopMetadata: undefined,
   previewMetadata: undefined,
   progressMetadata: undefined,
   typebotsQueue: state.typebotsQueue.map((queueItem) => ({
